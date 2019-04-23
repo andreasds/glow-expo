@@ -5,7 +5,7 @@ import { ScreenOrientation } from 'expo'
 import { Provider } from 'react-redux'
 import store from './android/redux/store'
 
-import RootNavigator from './android/components/navigations/HomeNavigator'
+import RootNavigator from './android/components/navigations/RootNavigator'
 
 class App extends Component {
   componentDidMount() {

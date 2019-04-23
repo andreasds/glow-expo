@@ -4,6 +4,17 @@ const width = Dimensions.get('window').height
 const height = Dimensions.get('window').width
 const padding = 0.05
 
+export const highlightButtonColor = 'lightgrey'
+
+export const buttonStyle = {
+    backgroundColor: 'darkgrey',
+    borderRadius: height * 0.05,
+    height: height * (1 - (6 * padding)) / 2,
+    marginHorizontal: width * padding,
+    marginVertical: height * padding,
+    width: width * (1 - (8 * padding)) / 3,
+}
+
 export const containerStyle = {
     backgroundColor: 'black',
     flex: 1,
@@ -11,13 +22,4 @@ export const containerStyle = {
     flexWrap: 'wrap',
     paddingHorizontal: width * padding,
     paddingVertical: height * padding
-}
-
-export const touchableHighlightStyle = {
-    backgroundColor: 'lightgrey',
-    borderRadius: 20,
-    height: height * (1 - (6 * padding)) / 2,
-    marginHorizontal: width * padding,
-    marginVertical: height * padding,
-    width: width * (1 - (8 * padding)) / 3,
 }
