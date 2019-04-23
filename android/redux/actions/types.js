@@ -1,0 +1,2 @@
+export const OPEN_DATABASE = 'OPEN_DATABASE'
+export const CLOSE_DATABASE = 'CLOSE_DATABASE'

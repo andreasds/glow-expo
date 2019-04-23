@@ -1,26 +1,33 @@
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import React, { Component } from 'react'
+import { Platform, StatusBar, Text, View } from 'react-native'
 import { ScreenOrientation } from 'expo'
 
-export default class App extends React.Component {
+import { Provider } from 'react-redux'
+import store from './android/redux/store'
+
+import RootNavigator from './android/components/navigations/HomeNavigator'
+
+class App extends Component {
   componentDidMount() {
     ScreenOrientation.allowAsync("LANDSCAPE_LEFT")
   }
 
   render() {
-    return (
-      <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
-      </View>
-    );
+    if (Platform.OS === 'android') {
+      return (
+        <Provider store={store}>
+          <StatusBar barStyle='light-content' hidden={true}  />
+          <RootNavigator />
+        </Provider>
+      )
+    } else {
+      return (
+        <View style={{ flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+          <Text>Open up App.js to start working on your app!</Text>
+        </View>
+      )
+    }
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App
