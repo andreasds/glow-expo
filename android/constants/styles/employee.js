@@ -1,8 +1,7 @@
 import { Dimensions } from 'react-native'
 
-const width = Dimensions.get('window').height
-const height = Dimensions.get('window').width
-const padding = 0.05
+const width = Dimensions.get('window').width
+const height = Dimensions.get('window').height
 
 export const highlightButtonColor = 'darkgrey'
 

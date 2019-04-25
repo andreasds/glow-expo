@@ -1,7 +1,7 @@
 import { OPEN_DATABASE, CLOSE_DATABASE } from '../actions/types'
 
 const initialState = {
-    db: {}
+    db: null
 }
 
 export default (state = initialState, action) => {
@@ -16,7 +16,7 @@ export default (state = initialState, action) => {
         case CLOSE_DATABASE: {
             return {
                 ...state,
-                db: {}
+                db: null
             }
         }
         default:

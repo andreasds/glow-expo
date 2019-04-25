@@ -8,15 +8,16 @@ import store from './android/redux/store'
 import RootNavigator from './android/components/navigations/RootNavigator'
 
 class App extends Component {
-  componentDidMount() {
-    ScreenOrientation.allowAsync("LANDSCAPE_LEFT")
+  constructor(props) {
+    super(props)
+    ScreenOrientation.allowAsync("LANDSCAPE")
   }
 
   render() {
     if (Platform.OS === 'android') {
       return (
         <Provider store={store}>
-          <StatusBar barStyle='light-content' hidden={true}  />
+          <StatusBar barStyle='light-content' hidden={true} />
           <RootNavigator />
         </Provider>
       )
