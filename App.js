@@ -10,7 +10,7 @@ import RootNavigator from './android/components/navigations/RootNavigator'
 class App extends Component {
   constructor(props) {
     super(props)
-    ScreenOrientation.allowAsync("LANDSCAPE")
+    ScreenOrientation.allowAsync("PORTRAIT")
   }
 
   render() {

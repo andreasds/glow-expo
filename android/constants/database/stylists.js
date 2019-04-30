@@ -1,10 +1,35 @@
 export const STYLISTS_SCHEMA = 'stylists'
 
+export const STYLIST_ID = 'stylist_id'
+export const STYLIST_FIRST_NAME = 'first_name'
+export const STYLIST_LAST_NAME = 'last_name'
+export const STYLIST_ACTIVE = 'active'
+
 export const createStylistTableQuery = () => {
     return 'CREATE TABLE IF NOT EXISTS ' + STYLISTS_SCHEMA + ' (' +
-        'stylist_id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, ' +
-        'first_name VARCHAR (50) NOT NULL, ' +
-        'last_name VARCHAR (50) NOT NULL DEFAULT (\'\'), ' +
-        'active CHAR (1) NOT NULL DEFAULT (\'Y\')' +
+        STYLIST_ID + ' INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, ' +
+        STYLIST_FIRST_NAME + ' VARCHAR (50) NOT NULL, ' +
+        STYLIST_LAST_NAME + ' VARCHAR (50) NOT NULL DEFAULT (\'\'), ' +
+        STYLIST_ACTIVE + ' CHAR (1) NOT NULL DEFAULT (\'Y\')' +
         ')'
+}
+
+export const insertStylistQuery = (stylist) => {
+    return 'INSERT INTO ' + STYLISTS_SCHEMA + ' (' +
+        STYLIST_FIRST_NAME + ', ' +
+        STYLIST_LAST_NAME +
+        ') VALUES (' +
+        '\'' + stylist.firstName + '\', ' +
+        '\'' + stylist.lastName + '\'' +
+        ')'
+}
+
+export const selectAllStylistQuery = (sort, order) => {
+    let query = 'SELECT * FROM ' + STYLISTS_SCHEMA
+    if (sort) {
+        query += ' ORDER BY ' + sort
+        if (order === 'desc') query += ' DESC'
+        else query += ' ASC'
+    }
+    return query
 }

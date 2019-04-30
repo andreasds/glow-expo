@@ -9,10 +9,10 @@ export const highlightButtonColor = 'lightgrey'
 export const buttonStyle = {
     backgroundColor: 'darkgrey',
     borderRadius: height * 0.05,
-    height: height * (1 - (6 * padding)) / 2,
+    height: height * (1 - (8 * padding)) / 3,
     marginHorizontal: width * padding,
     marginVertical: height * padding,
-    width: width * (1 - (8 * padding)) / 3,
+    width: width * (1 - (6 * padding)) / 2,
 }
 
 export const containerStyle = {
