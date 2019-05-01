@@ -19,13 +19,33 @@ export const insertStylistQuery = (stylist) => {
         STYLIST_FIRST_NAME + ', ' +
         STYLIST_LAST_NAME +
         ') VALUES (' +
-        '\'' + stylist.firstName + '\', ' +
-        '\'' + stylist.lastName + '\'' +
+        '\'' + stylist.first_name + '\', ' +
+        '\'' + stylist.last_name + '\'' +
         ')'
+}
+
+export const deleteStylistQuery = (stylist) => {
+    return 'UPDATE ' + STYLISTS_SCHEMA +
+        ' SET ' +
+        STYLIST_ACTIVE + ' = \'N\' ' +
+        'WHERE ' +
+        STYLIST_ID + ' = ' + stylist.stylist_id
 }
 
 export const selectAllStylistQuery = (sort, order) => {
     let query = 'SELECT * FROM ' + STYLISTS_SCHEMA
+    if (sort) {
+        query += ' ORDER BY ' + sort
+        if (order === 'desc') query += ' DESC'
+        else query += ' ASC'
+    }
+    return query
+}
+
+export const selectAllActiveStylistQuery = (sort, order) => {
+    let query = 'SELECT * FROM ' + STYLISTS_SCHEMA +
+        ' WHERE ' +
+        STYLIST_ACTIVE + ' = \'Y\''
     if (sort) {
         query += ' ORDER BY ' + sort
         if (order === 'desc') query += ' DESC'

@@ -19,7 +19,7 @@ import { createProductDetailTable } from '../../redux/actions/database/ProductDe
 import { createSaleTable } from '../../redux/actions/database/SaleActions'
 import { createSaleDetailTable } from '../../redux/actions/database/SaleDetailActions'
 import { createSaleProductTable } from '../../redux/actions/database/SaleProductActions'
-import { createStylistTable, selectAllStylist } from '../../redux/actions/database/StylistActions'
+import { createStylistTable, selectAllActiveStylist } from '../../redux/actions/database/StylistActions'
 import { createStylistServiceTable } from '../../redux/actions/database/StylistServiceActions'
 import { createVersionTable, getLastVersion, insertCurrentVersion } from '../../redux/actions/database/VersionActions'
 
@@ -59,7 +59,7 @@ class HomeScreen extends Component {
                         // TODO: database modification
                     } else {
                         this.setState({ loading: this.state.loading + 1 })
-                        selectAllStylist(this.props.database.db, STYLIST_FIRST_NAME, 'asc', this._reinitializeHome)
+                        selectAllActiveStylist(this.props.database.db, STYLIST_FIRST_NAME, 'asc', this._reinitializeHome)
                     }
                     this.setState({ loading: this.state.loading - 1 })
                     break
@@ -98,7 +98,7 @@ class HomeScreen extends Component {
                     console.log('Create stylist table ' + JSON.stringify(_result[key].result))
 
                     this.setState({ loading: this.state.loading + 1 })
-                    selectAllStylist(this.props.database.db, STYLIST_FIRST_NAME, 'asc', this._reinitializeHome)
+                    selectAllActiveStylist(this.props.database.db, STYLIST_FIRST_NAME, 'asc', this._reinitializeHome)
 
                     this.setState({ loading: this.state.loading - 1 })
                     break
@@ -196,7 +196,7 @@ class HomeScreen extends Component {
                     style={buttonStyle}
                     underlayColor={highlightButtonColor}>
                     <View>
-                        <Text>EMPLOYEE</Text>
+                        <Text>PEGAWAI</Text>
                     </View>
                 </TouchableHighlight>
                 <TouchableHighlight

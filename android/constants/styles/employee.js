@@ -49,7 +49,7 @@ export const listContainer = {
     borderRadius: width * 0.02,
     flex: 1,
     flexDirection: 'row',
-    height: width * 0.15,
+    minHeight: width * 0.15,
     margin: width * 0.003,
     padding: width * 0.02
 }
@@ -63,7 +63,7 @@ export const listTextStyle = {
     color: 'white',
     flex: 1,
     fontSize: width * 0.06,
-    height: width * 0.1,
+    minHeight: width * 0.1,
     margin: width * 0.01,
     textAlignVertical: 'center'
 }

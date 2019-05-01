@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Alert, ScrollView, Text, TextInput, TouchableHighlight, View } from 'react-native'
+import { Alert, BackHandler, ScrollView, Text, TextInput, TouchableHighlight, View } from 'react-native'
 import { connect } from 'react-redux'
 
 import { STYLIST_FIRST_NAME } from '../../../constants/database/stylists'
@@ -13,24 +13,29 @@ import { containerStyle, scrollContainerStyle } from '../../../constants/styles/
 import { textStyle, textInputStyle } from '../../../constants/styles/employee'
 import { titleTextStyle } from '../../../constants/styles/employee'
 
-import { insertStylist, selectAllStylist } from '../../../redux/actions/database/StylistActions'
+import { insertStylist, selectAllActiveStylist } from '../../../redux/actions/database/StylistActions'
 
-class AddEmployeeScreen extends Component {
+class ModifyEmployeeScreen extends Component {
     static navigationOptions = {
         header: null
     }
 
     constructor(props) {
         super(props)
+
+        const { navigation } = this.props
+        let mode = navigation.getParam('mode', '')
+        let stylist = navigation.getParam('stylist', {})
         this.state = {
-            firstName: '',
-            lastName: '',
+            mode,
+            stylist,
             loading: 0,
-            result: 'waiting',
+            result: '',
             error: ''
         }
 
         this._reinitializeAddEmployee = this._reinitializeAddEmployee.bind(this)
+        this._onCancelButtonPressed = this._onCancelButtonPressed.bind(this)
     }
 
     _reinitializeAddEmployee(_result) {
@@ -40,7 +45,7 @@ class AddEmployeeScreen extends Component {
                     this.setState({ result: _result[key].result })
                     if (_result[key].result === 'success') {
                         this.setState({ loading: this.state.loading + 1 })
-                        selectAllStylist(this.props.database.db, STYLIST_FIRST_NAME, 'asc', this._reinitializeAddEmployee)
+                        selectAllActiveStylist(this.props.database.db, STYLIST_FIRST_NAME, 'asc', this._reinitializeAddEmployee)
                     } else if (_result[key].result === 'error') {
                         this.setState({
                             loading: this.state.loading + 1,
@@ -67,32 +72,55 @@ class AddEmployeeScreen extends Component {
         }
     }
 
+    componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this._onCancelButtonPressed)
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this._onCancelButtonPressed)
+    }
+
     _onSaveButtonPressed() {
-        if (this.state.firstName) {
+        if (this.state.stylist.first_name) {
             this.setState({ loading: this.state.loading + 1 })
-            let stylist = {
-                firstName: this.state.firstName,
-                lastName: this.state.lastName
+            if (this.state.mode === 'add') {
+                insertStylist(this.props.database.db, this.state.stylist, this._reinitializeAddEmployee)
+            } else if (this.state.mode === 'edit') {
             }
-            insertStylist(this.props.database.db, stylist, this._reinitializeAddEmployee)
+        } else {
+            Alert.alert(
+                '',
+                'Nama depan tidak boleh kosong',
+                [
+                    {
+                        text: 'OK', onPress: () => { }
+                    }
+                ],
+                { cancelable: true }
+            )
         }
     }
 
     _onCancelButtonPressed() {
         Alert.alert(
             '',
-            'Are you sure want to cancel?',
+            this.state.mode === 'add' ?
+                'Apakah anda batal menambah pegawai?' :
+                this.state.mode === 'edit' ?
+                    'Apakah anda batal edit pegawai?' :
+                    'UNKNOWN MODE',
             [
                 {
-                    text: 'OK', onPress: () => {
+                    text: 'Ya', onPress: () => {
                         const { goBack } = this.props.navigation
                         goBack()
                     }
                 },
-                { text: 'Cancel', style: 'cancel' }
+                { text: 'Batal', style: 'cancel' }
             ],
             { cancelable: true }
         )
+        return true
     }
 
     render() {
@@ -100,10 +128,22 @@ class AddEmployeeScreen extends Component {
         // console.log('state = ' + JSON.stringify(this.state))
 
         if (this.state.loading) {
-            if (this.state.result === 'waiting') {
-                return loadingScreen('Save new employee into database', '')
+            if (this.state.result === '') {
+                if (this.state.mode === 'add') {
+                    return loadingScreen('Save new employee into database', '')
+                } else if (this.state.mode === 'edit') {
+                    return loadingScreen('Update employee into database', '')
+                } else {
+                    return loadingScreen('Unknown mode', '')
+                }
             } else if (this.state.result === 'error') {
-                return loadingScreen('ERROR Save new employee into database', this.state.error)
+                if (this.state.mode === 'add') {
+                    return loadingScreen('ERROR Save new employee into database', this.state.error)
+                } else if (this.state.mode === 'edit') {
+                    return loadingScreen('ERROR Update employee into database', this.state.error)
+                } else {
+                    return loadingScreen('Unknown mode', this.state.error)
+                }
             } else {
                 return loadingScreen('Updating list employees', '')
             }
@@ -111,22 +151,36 @@ class AddEmployeeScreen extends Component {
 
         return (
             <View style={containerStyle}>
-                <Text style={titleTextStyle}>CREATE NEW EMPLOYEE</Text>
+                {
+                    this.state.mode === 'add' ?
+                        <Text style={titleTextStyle}>TAMBAH PEGAWAI</Text> :
+                        this.state.mode === 'edit' ?
+                            <Text style={titleTextStyle}>EDIT PEGAWAI</Text> :
+                            <Text style={titleTextStyle}>UNKNOWN MODE</Text>
+                }
                 <ScrollView style={{ ...scrollContainerStyle }}>
-                    <Text style={textStyle}>First Name *</Text>
+                    <Text style={textStyle}>Nama Depan *</Text>
                     <TextInput
                         maxLength={50}
-                        onChangeText={(text) => this.setState({ firstName: text })}
+                        onChangeText={(text) => {
+                            let stylist = this.state.stylist
+                            stylist.first_name = text
+                            this.setState({ stylist })
+                        }}
                         style={textInputStyle}
                         placeholder='First Name'
-                        value={this.state.firstName} />
-                    <Text style={textStyle}>Last Name</Text>
+                        value={this.state.stylist.first_name} />
+                    <Text style={textStyle}>Nama Belakang</Text>
                     <TextInput
                         maxLength={50}
-                        onChangeText={(text) => this.setState({ lastName: text })}
+                        onChangeText={(text) => {
+                            let stylist = this.state.stylist
+                            stylist.last_name = text
+                            this.setState({ stylist })
+                        }}
                         style={textInputStyle}
                         placeholder='Last Name'
-                        value={this.state.lastName} />
+                        value={this.state.stylist.last_name} />
                 </ScrollView>
                 <View style={buttonContainerStyle}>
                     <TouchableHighlight
@@ -134,7 +188,7 @@ class AddEmployeeScreen extends Component {
                         style={buttonStyle}
                         underlayColor={highlightButtonColor}>
                         <View>
-                            <Text style={buttonTextStyle}>SAVE</Text>
+                            <Text style={buttonTextStyle}>SIMPAN</Text>
                         </View>
                     </TouchableHighlight>
                     <TouchableHighlight
@@ -142,7 +196,7 @@ class AddEmployeeScreen extends Component {
                         style={buttonStyle}
                         underlayColor={highlightButtonColor}>
                         <View>
-                            <Text style={buttonTextStyle}>CANCEL</Text>
+                            <Text style={buttonTextStyle}>BATAL</Text>
                         </View>
                     </TouchableHighlight>
                 </View>
@@ -164,4 +218,4 @@ const mapDispatchToProps = dispatch => ({
     stylistsGot: (stylists) => dispatch(stylistsGot(stylists))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(AddEmployeeScreen)
+export default connect(mapStateToProps, mapDispatchToProps)(ModifyEmployeeScreen)

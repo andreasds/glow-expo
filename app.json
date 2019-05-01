@@ -20,7 +20,7 @@
       "fallbackToCacheTimeout": 0
     },
     "assetBundlePatterns": [
-      "**/*"
+      "node_modules/@expo/vector-icons/fonts/FontAwesome.ttf"
     ],
     "ios": {
       "supportsTablet": true

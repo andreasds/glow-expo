@@ -1,7 +1,13 @@
 import React, { Component } from 'react'
-import { FlatList, Text, TouchableHighlight, View } from 'react-native'
+import { Alert, FlatList, Text, TouchableHighlight, View } from 'react-native'
 import { connect } from 'react-redux'
 import { FontAwesome } from '@expo/vector-icons'
+
+import { STYLIST_FIRST_NAME } from '../../../constants/database/stylists'
+
+import { loadingScreen } from '../../../constants/LoadingScreen'
+
+import { stylistsGot } from '../../../redux/actions/database/StylistActions'
 
 import { buttonContainerStyle, buttonStyle, buttonTextStyle, highlightButtonColor } from '../../../constants/styles/employee'
 import { containerStyle } from '../../../constants/styles/employee'
@@ -10,14 +16,61 @@ import { listContainer, listStyle, listTextStyle } from '../../../constants/styl
 import { modifyButtonContainerStyle, modifyButtonStyle } from '../../../constants/styles/employee'
 import { titleTextStyle } from '../../../constants/styles/employee'
 
+import { deleteStylist, selectAllActiveStylist } from '../../../redux/actions/database/StylistActions'
+
 class EmployeeScreen extends Component {
     static navigationOptions = {
         header: null
     }
 
+    constructor(props) {
+        super(props)
+        this.state = {
+            loading: 0,
+            stylist: {},
+            result: '',
+            error: ''
+        }
+
+        this._reinitializeEmployee = this._reinitializeEmployee.bind(this)
+    }
+
+    _reinitializeEmployee(_result) {
+        for (let key in _result) {
+            switch (key) {
+                case 'deleteStylist': {
+                    this.setState({ result: _result[key].result })
+                    if (_result[key].result === 'success') {
+                        this.setState({ loading: this.state.loading + 1 })
+                        selectAllActiveStylist(this.props.database.db, STYLIST_FIRST_NAME, 'asc', this._reinitializeEmployee)
+                    } else if (_result[key].result === 'error') {
+                        this.setState({
+                            loading: this.state.loading + 1,
+                            error: _result[key].error
+                        })
+                    }
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'stylists': {
+                    let stylists = _result[key]
+                    this.props.stylistsGot(stylists)
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                default: {
+                    console.log('Unprocessed _result[\'' + key + '\'] = ' + JSON.stringify(_result[key]))
+                    break
+                }
+            }
+        }
+    }
+
     _onAddEmployeePressed() {
         const { navigate } = this.props.navigation
-        navigate('AddEmployee')
+        navigate('AddEmployee', {
+            mode: 'add'
+        })
     }
 
     _onEditEmployeePressed(stylist) {
@@ -25,16 +78,43 @@ class EmployeeScreen extends Component {
     }
 
     _onRemoveEmployeePressed(stylist) {
-        console.log('stylist = ' + JSON.stringify(stylist))
+        Alert.alert(
+            '',
+            'Apakah anda ingin menghapus ' + stylist.first_name + '?',
+            [
+                {
+                    text: 'Ya', onPress: () => {
+                        this.setState({
+                            loading: this.state.loading + 1,
+                            stylist,
+                            result: ''
+                        })
+                        deleteStylist(this.props.database.db, stylist, this._reinitializeEmployee)
+                    }
+                },
+                { text: 'Batal', style: 'cancel' }
+            ],
+            { cancelable: true }
+        )
     }
 
     render() {
-        console.log('props = ' + JSON.stringify(this.props))
-        console.log('state = ' + JSON.stringify(this.state))
+        // console.log('props = ' + JSON.stringify(this.props))
+        // console.log('state = ' + JSON.stringify(this.state))
+
+        if (this.state.loading) {
+            if (this.state.result === '') {
+                return loadingScreen('Delete ' + this.state.stylist.first_name + ' in database', '')
+            } else if (this.state.result === 'error') {
+                return loadingScreen('ERROR Delete ' + this.state.stylist.first_name + ' in database', this.state.error)
+            } else {
+                return loadingScreen('Updating list employees', '')
+            }
+        }
 
         return (
             <View style={containerStyle}>
-                <Text style={titleTextStyle}>LIST EMPLOYEES</Text>
+                <Text style={titleTextStyle}>LIST PEGAWAI</Text>
                 <FlatList
                     data={this.props.stylist.stylists}
                     keyExtractor={(stylistItem, stylistIndex) => stylistIndex.toString()}
@@ -64,7 +144,7 @@ class EmployeeScreen extends Component {
                         onPress={() => this._onAddEmployeePressed()}
                         style={buttonStyle}
                         underlayColor={highlightButtonColor}>
-                        <Text style={buttonTextStyle}>ADD EMPLOYEE</Text>
+                        <Text style={buttonTextStyle}>TAMBAH PEGAWAI</Text>
                     </TouchableHighlight>
                 </View>
             </View>
@@ -82,6 +162,7 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = dispatch => ({
+    stylistsGot: (stylists) => dispatch(stylistsGot(stylists))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(EmployeeScreen)
