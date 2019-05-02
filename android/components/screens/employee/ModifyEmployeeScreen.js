@@ -92,7 +92,7 @@ class ModifyEmployeeScreen extends Component {
         } else {
             Alert.alert(
                 '',
-                'Nama depan tidak boleh kosong',
+                'First name cannot be empty!',
                 [
                     {
                         text: 'OK', onPress: () => { }
@@ -107,18 +107,18 @@ class ModifyEmployeeScreen extends Component {
         Alert.alert(
             '',
             this.state.mode === 'add' ?
-                'Apakah anda batal menambah pegawai?' :
+                'Are you sure you want to cancel?' :
                 this.state.mode === 'edit' ?
-                    'Apakah anda batal edit pegawai?' :
+                    'Are you sure you want to discard this change?' :
                     'UNKNOWN MODE',
             [
                 {
-                    text: 'Ya', onPress: () => {
+                    text: 'OK', onPress: () => {
                         const { goBack } = this.props.navigation
                         goBack()
                     }
                 },
-                { text: 'Batal', style: 'cancel' }
+                { text: 'Cancel', style: 'cancel' }
             ],
             { cancelable: true }
         )
@@ -155,13 +155,13 @@ class ModifyEmployeeScreen extends Component {
             <View style={containerStyle}>
                 {
                     this.state.mode === 'add' ?
-                        <Text style={titleTextStyle}>TAMBAH PEGAWAI</Text> :
+                        <Text style={titleTextStyle}>ADD EMPLOYEE</Text> :
                         this.state.mode === 'edit' ?
-                            <Text style={titleTextStyle}>EDIT PEGAWAI</Text> :
+                            <Text style={titleTextStyle}>EDIT EMPLOYEE</Text> :
                             <Text style={titleTextStyle}>UNKNOWN MODE</Text>
                 }
                 <ScrollView style={{ ...scrollContainerStyle }}>
-                    <Text style={textStyle}>Nama Depan *</Text>
+                    <Text style={textStyle}>First Name *</Text>
                     <TextInput
                         maxLength={50}
                         onChangeText={(text) => {
@@ -172,7 +172,7 @@ class ModifyEmployeeScreen extends Component {
                         style={textInputStyle}
                         placeholder='First Name'
                         value={this.state.stylist.first_name} />
-                    <Text style={textStyle}>Nama Belakang</Text>
+                    <Text style={textStyle}>Last Name</Text>
                     <TextInput
                         maxLength={50}
                         onChangeText={(text) => {
@@ -190,7 +190,7 @@ class ModifyEmployeeScreen extends Component {
                         style={buttonStyle}
                         underlayColor={highlightButtonColor}>
                         <View>
-                            <Text style={buttonTextStyle}>SIMPAN</Text>
+                            <Text style={buttonTextStyle}>SAVE</Text>
                         </View>
                     </TouchableHighlight>
                     <TouchableHighlight
@@ -198,7 +198,7 @@ class ModifyEmployeeScreen extends Component {
                         style={buttonStyle}
                         underlayColor={highlightButtonColor}>
                         <View>
-                            <Text style={buttonTextStyle}>BATAL</Text>
+                            <Text style={buttonTextStyle}>CANCEL</Text>
                         </View>
                     </TouchableHighlight>
                 </View>

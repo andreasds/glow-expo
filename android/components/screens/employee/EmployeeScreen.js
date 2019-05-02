@@ -84,10 +84,10 @@ class EmployeeScreen extends Component {
     _onRemoveEmployeePressed(stylist) {
         Alert.alert(
             '',
-            'Apakah anda ingin menghapus ' + stylist.first_name + '?',
+            'Are you sure you want to delete ' + stylist.first_name + '?',
             [
                 {
-                    text: 'Ya', onPress: () => {
+                    text: 'OK', onPress: () => {
                         this.setState({
                             loading: this.state.loading + 1,
                             stylist,
@@ -96,7 +96,7 @@ class EmployeeScreen extends Component {
                         deleteStylist(this.props.database.db, stylist, this._reinitializeEmployee)
                     }
                 },
-                { text: 'Batal', style: 'cancel' }
+                { text: 'Cancel', style: 'cancel' }
             ],
             { cancelable: true }
         )
@@ -118,7 +118,7 @@ class EmployeeScreen extends Component {
 
         return (
             <View style={containerStyle}>
-                <Text style={titleTextStyle}>LIST PEGAWAI</Text>
+                <Text style={titleTextStyle}>EMPLOYEES LIST</Text>
                 <FlatList
                     data={this.props.stylist.stylists}
                     keyExtractor={(stylistItem, stylistIndex) => stylistIndex.toString()}
@@ -148,7 +148,7 @@ class EmployeeScreen extends Component {
                         onPress={() => this._onAddEmployeePressed()}
                         style={buttonStyle}
                         underlayColor={highlightButtonColor}>
-                        <Text style={buttonTextStyle}>TAMBAH PEGAWAI</Text>
+                        <Text style={buttonTextStyle}>ADD EMPLOYEE</Text>
                     </TouchableHighlight>
                 </View>
             </View>

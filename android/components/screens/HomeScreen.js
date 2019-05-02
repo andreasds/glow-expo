@@ -196,7 +196,7 @@ class HomeScreen extends Component {
                     style={buttonStyle}
                     underlayColor={highlightButtonColor}>
                     <View>
-                        <Text>PEGAWAI</Text>
+                        <Text>EMPLOYEE</Text>
                     </View>
                 </TouchableHighlight>
                 <TouchableHighlight
