@@ -3,7 +3,8 @@ import {
     deleteStylistQuery,
     insertStylistQuery,
     selectAllStylistQuery,
-    selectAllActiveStylistQuery
+    selectAllActiveStylistQuery,
+    updateStylistQuery
 } from '../../../constants/database/stylists'
 import { UPDATE_STYLIST } from '../types'
 
@@ -35,6 +36,24 @@ export const insertStylist = (db, stylist, _callback) => {
                 },
                 (error) => {
                     _callback({ insertStylist: { result: 'error', error } })
+                }
+            )
+        },
+        (error) => { },
+        (success) => { }
+    )
+}
+
+export const updateStylist = (db, stylist, _callback) => {
+    db.transaction(
+        (tx) => {
+            tx.executeSql(updateStylistQuery(stylist), [],
+                (_, { rows: { _array } }) => {
+                    // _array = []
+                    _callback({ updateStylist: { result: 'success' } })
+                },
+                (error) => {
+                    _callback({ updateStylist: { result: 'error', error } })
                 }
             )
         },

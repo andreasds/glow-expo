@@ -74,7 +74,11 @@ class EmployeeScreen extends Component {
     }
 
     _onEditEmployeePressed(stylist) {
-        console.log('stylist = ' + JSON.stringify(stylist))
+        const { navigate } = this.props.navigation
+        navigate('EditEmployee', {
+            mode: 'edit',
+            stylist
+        })
     }
 
     _onRemoveEmployeePressed(stylist) {

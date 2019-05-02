@@ -24,11 +24,21 @@ export const insertStylistQuery = (stylist) => {
         ')'
 }
 
+export const updateStylistQuery = (stylist) => {
+    return 'UPDATE ' + STYLISTS_SCHEMA +
+        ' SET ' +
+        STYLIST_FIRST_NAME + ' = \'' + stylist.first_name + '\', ' +
+        STYLIST_LAST_NAME + ' = \'' + stylist.last_name + '\', ' +
+        STYLIST_ACTIVE + ' = \'' + stylist.active + '\' ' +
+        ' WHERE ' +
+        STYLIST_ID + ' = ' + stylist.stylist_id
+}
+
 export const deleteStylistQuery = (stylist) => {
     return 'UPDATE ' + STYLISTS_SCHEMA +
         ' SET ' +
-        STYLIST_ACTIVE + ' = \'N\' ' +
-        'WHERE ' +
+        STYLIST_ACTIVE + ' = \'N\'' +
+        ' WHERE ' +
         STYLIST_ID + ' = ' + stylist.stylist_id
 }
 

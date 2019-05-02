@@ -13,7 +13,7 @@ import { containerStyle, scrollContainerStyle } from '../../../constants/styles/
 import { textStyle, textInputStyle } from '../../../constants/styles/employee'
 import { titleTextStyle } from '../../../constants/styles/employee'
 
-import { insertStylist, selectAllActiveStylist } from '../../../redux/actions/database/StylistActions'
+import { insertStylist, selectAllActiveStylist, updateStylist } from '../../../redux/actions/database/StylistActions'
 
 class ModifyEmployeeScreen extends Component {
     static navigationOptions = {
@@ -41,7 +41,8 @@ class ModifyEmployeeScreen extends Component {
     _reinitializeAddEmployee(_result) {
         for (let key in _result) {
             switch (key) {
-                case 'insertStylist': {
+                case 'insertStylist':
+                case 'updateStylist': {
                     this.setState({ result: _result[key].result })
                     if (_result[key].result === 'success') {
                         this.setState({ loading: this.state.loading + 1 })
@@ -86,6 +87,7 @@ class ModifyEmployeeScreen extends Component {
             if (this.state.mode === 'add') {
                 insertStylist(this.props.database.db, this.state.stylist, this._reinitializeAddEmployee)
             } else if (this.state.mode === 'edit') {
+                updateStylist(this.props.database.db, this.state.stylist, this._reinitializeAddEmployee)
             }
         } else {
             Alert.alert(
