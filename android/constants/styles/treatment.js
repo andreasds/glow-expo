@@ -30,6 +30,25 @@ export const buttonTextStyle = {
     textAlignVertical: 'center'
 }
 
+export const checkBoxContainerStyle = {
+    alignItems: 'center',
+    backgroundColor: 'black',
+    flex: 1,
+    flexDirection: 'row',
+    height: width * 0.1
+}
+
+export const checkBoxContainerStyle2 = {
+    ...checkBoxContainerStyle,
+    backgroundColor: 'lightslategrey',
+    borderRadius: width * 0.01
+}
+
+export const checkBoxStyle = {
+    backgroundColor: 'darkgrey',
+    marginHorizontal: width * 0.03
+}
+
 export const containerStyle = {
     backgroundColor: 'black',
     flex: 1,
@@ -55,8 +74,14 @@ export const listContainer = {
 }
 
 export const listStyle = {
+    borderRadius: width * 0.01,
     flex: 1,
     marginVertical: width * 0.01
+}
+
+export const listStyle2 = {
+    ...listStyle,
+    backgroundColor: 'white'
 }
 
 export const listTextStyle = {
@@ -82,6 +107,21 @@ export const modifyButtonStyle = {
     justifyContent: 'center',
     margin: width * 0.005,
     width: width * 0.1
+}
+
+export const numberInputStyle = {
+    backgroundColor: 'darkgrey',
+    borderRadius: width * 0.015,
+    fontSize: width * 0.06,
+    height: width * 0.1,
+    padding: width * 0.02,
+    textAlign: 'right',
+    textAlignVertical: 'center'
+}
+
+export const numberInputStyle2 = {
+    ...numberInputStyle,
+    width: width * 0.33
 }
 
 export const scrollContainerStyle = {

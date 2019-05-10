@@ -3,11 +3,13 @@ import { connect } from 'react-redux'
 
 import HomeScreen from '../screens/HomeScreen'
 import EmployeeNavigator from '../navigations/EmployeeNavigator'
+import TreatmentNavigator from '../navigations/TreatmentNavigator'
 
 const RootNavigator = createStackNavigator(
     {
         Home: HomeScreen,
-        Employee: EmployeeNavigator
+        Employee: EmployeeNavigator,
+        Treatment: TreatmentNavigator
     }
 )
 

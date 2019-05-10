@@ -11,9 +11,11 @@ import { UPDATE_STYLIST } from '../types'
 export const createStylistTable = (db, _callback) => {
     db.transaction(
         (tx) => {
+            console.log('query = ' + JSON.stringify(createStylistTableQuery()))
             tx.executeSql(createStylistTableQuery(), [],
-                (_, { rows: { _array } }) => {
+                (_, success) => {
                     // _array = []
+                    console.log('success = ' + JSON.stringify(success))
                     _callback({ stylistTable: { result: 'success' } })
                 },
                 (error) => {
@@ -30,9 +32,14 @@ export const insertStylist = (db, stylist, _callback) => {
     db.transaction(
         (tx) => {
             tx.executeSql(insertStylistQuery(stylist), [],
-                (_, { rows: { _array } }) => {
-                    // _array = []
-                    _callback({ insertStylist: { result: 'success' } })
+                (_, success) => {
+                    // success = {"insertId":17,"rowsAffected":1,"rows":{"_array":[],"length":0}}
+                    _callback({
+                        insertStylist: {
+                            result: 'success',
+                            insertId: success.insertId
+                        }
+                    })
                 },
                 (error) => {
                     _callback({ insertStylist: { result: 'error', error } })
@@ -47,9 +54,12 @@ export const insertStylist = (db, stylist, _callback) => {
 export const updateStylist = (db, stylist, _callback) => {
     db.transaction(
         (tx) => {
+            console.log('stylist = ' + JSON.stringify(stylist))
+            console.log('query = ' + JSON.stringify(updateStylistQuery(stylist)))
             tx.executeSql(updateStylistQuery(stylist), [],
-                (_, { rows: { _array } }) => {
-                    // _array = []
+                (_, success) => {
+                    // success = []
+                    console.log('success = ' + JSON.stringify(success))
                     _callback({ updateStylist: { result: 'success' } })
                 },
                 (error) => {
@@ -65,9 +75,12 @@ export const updateStylist = (db, stylist, _callback) => {
 export const deleteStylist = (db, stylist, _callback) => {
     db.transaction(
         (tx) => {
+            console.log('stylist = ' + JSON.stringify(stylist))
+            console.log('query = ' + JSON.stringify(deleteStylistQuery(stylist)))
             tx.executeSql(deleteStylistQuery(stylist), [],
-                (_, { rows: { _array } }) => {
-                    // _array = []
+                (_, success) => {
+                    // success = []
+                    console.log('success = ' + JSON.stringify(success))
                     _callback({ deleteStylist: { result: 'success' } })
                 },
                 (error) => {
@@ -84,12 +97,22 @@ export const selectAllStylist = (db, sort, order, _callback) => {
     db.transaction(
         (tx) => {
             tx.executeSql(selectAllStylistQuery(sort, order), [],
-                (_, { rows: { _array } }) => {
-                    // _array = [{"stylist_id":1,"first_name":"Wewew","last_name":"Hahay","active":"Y"},{"stylist_id":2,"first_name":"Nguing","last_name":"Ndut","active":"Y"}]
-                    _callback({ stylists: _array })
+                (_, success) => {
+                    // success = {"rowsAffected":0,"rows":{"_array":[{"stylist_id":4,"first_name":"Anang","last_name":"Budi","active":"Y"},{"stylist_id":6,"first_name":"Ngok","last_name":"Tet","active":"Y"}],"length":2}}
+                    _callback({
+                        stylists: {
+                            _array: success.rows._array,
+                            length: success.rows.length
+                        }
+                    })
                 },
                 (error) => {
-                    _callback({ stylists: null })
+                    _callback({
+                        stylists: {
+                            _array: null,
+                            length: 0
+                        }
+                    })
                 }
             )
         },
@@ -102,12 +125,22 @@ export const selectAllActiveStylist = (db, sort, order, _callback) => {
     db.transaction(
         (tx) => {
             tx.executeSql(selectAllActiveStylistQuery(sort, order), [],
-                (_, { rows: { _array } }) => {
-                    // _array = [{"stylist_id":1,"first_name":"Wewew","last_name":"Hahay","active":"Y"},{"stylist_id":2,"first_name":"Nguing","last_name":"Ndut","active":"Y"}]
-                    _callback({ stylists: _array })
+                (_, success) => {
+                    // success = {"rowsAffected":0,"rows":{"_array":[{"stylist_id":4,"first_name":"Anang","last_name":"Budi","active":"Y"},{"stylist_id":6,"first_name":"Ngok","last_name":"Tet","active":"Y"}],"length":2}}
+                    _callback({
+                        stylists: {
+                            _array: success.rows._array,
+                            length: success.rows.length
+                        }
+                    })
                 },
                 (error) => {
-                    _callback({ stylists: null })
+                    _callback({
+                        stylists: {
+                            _array: null,
+                            length: 0
+                        }
+                    })
                 }
             )
         },
@@ -116,9 +149,10 @@ export const selectAllActiveStylist = (db, sort, order, _callback) => {
     )
 }
 
-export const stylistsGot = (stylists) => ({
+export const stylistsGot = (stylists, stylistsLen) => ({
     type: UPDATE_STYLIST,
     payload: {
-        stylists
+        stylists,
+        stylistsLen
     }
 })

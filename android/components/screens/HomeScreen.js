@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { SQLite } from 'expo'
 import { DATABASE_NAME } from '../../constants/database/config'
 import { STYLIST_FIRST_NAME } from '../../constants/database/stylists'
+import { PRODUCT_NAME } from '../../constants/database/productsDetails'
 
 import { buttonStyle, highlightButtonColor } from '../../constants/styles/home'
 import { containerStyle } from '../../constants/styles/home'
@@ -13,9 +14,10 @@ import { loadingScreen } from '../../constants/LoadingScreen'
 
 import { databaseOpened } from '../../redux/actions/DatabaseActions'
 import { stylistsGot } from '../../redux/actions/database/StylistActions'
+import { productsGot } from '../../redux/actions/database/ProductDetailActions'
 
 import { createProductTable } from '../../redux/actions/database/ProductActions'
-import { createProductDetailTable } from '../../redux/actions/database/ProductDetailActions'
+import { createProductDetailTable, selectAllActiveProduct } from '../../redux/actions/database/ProductDetailActions'
 import { createSaleTable } from '../../redux/actions/database/SaleActions'
 import { createSaleDetailTable } from '../../redux/actions/database/SaleDetailActions'
 import { createSaleProductTable } from '../../redux/actions/database/SaleProductActions'
@@ -58,7 +60,8 @@ class HomeScreen extends Component {
                     } else if (lastVersion.version !== currentVersion) {
                         // TODO: database modification
                     } else {
-                        this.setState({ loading: this.state.loading + 1 })
+                        this.setState({ loading: this.state.loading + 2 })
+                        selectAllActiveProduct(this.props.database.db, PRODUCT_NAME, 'asc', this._reinitializeHome)
                         selectAllActiveStylist(this.props.database.db, STYLIST_FIRST_NAME, 'asc', this._reinitializeHome)
                     }
                     this.setState({ loading: this.state.loading - 1 })
@@ -76,6 +79,10 @@ class HomeScreen extends Component {
                 }
                 case 'productDetailTable': {
                     console.log('Create product detail table ' + JSON.stringify(_result[key].result))
+
+                    this.setState({ loading: this.state.loading + 1 })
+                    selectAllActiveProduct(this.props.database.db, PRODUCT_NAME, 'asc', this._reinitializeHome)
+
                     this.setState({ loading: this.state.loading - 1 })
                     break
                 }
@@ -118,9 +125,15 @@ class HomeScreen extends Component {
                     this.setState({ loading: this.state.loading - 1 })
                     break
                 }
+                case 'products': {
+                    let products = _result[key]
+                    this.props.productsGot(products._array, products.length)
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
                 case 'stylists': {
                     let stylists = _result[key]
-                    this.props.stylistsGot(stylists)
+                    this.props.stylistsGot(stylists._array, stylists.length)
                     this.setState({ loading: this.state.loading - 1 })
                     break
                 }
@@ -154,7 +167,8 @@ class HomeScreen extends Component {
     }
 
     _onTreatmentButtonPressed() {
-
+        const { navigate } = this.props.navigation
+        navigate('Treatment')
     }
 
     _onPrinterButtonPressed() {
@@ -167,9 +181,16 @@ class HomeScreen extends Component {
 
         if (!this.props.database.db ||
             this.state.loading ||
+            !this.props.product.products ||
             !this.props.stylist.stylists) {
             if (!this.props.database.db) {
                 return loadingScreen('Reading database', '')
+            } else if (!this.props.product.products) {
+                if (this.state.loading) {
+                    return loadingScreen('Reading treatments', '')
+                } else {
+                    return loadingScreen('ERROR: Reading treatments', '')
+                }
             } else if (!this.props.stylist.stylists) {
                 if (this.state.loading) {
                     return loadingScreen('Reading stylists', '')
@@ -222,16 +243,19 @@ class HomeScreen extends Component {
 
 const mapStateToProps = state => {
     const { db } = state.databaseReducers
-    const { stylists } = state.stylistReducers
+    const { products, productsLen } = state.productReducers
+    const { stylists, stylistsLen } = state.stylistReducers
     return {
         database: { db },
-        stylist: { stylists }
+        product: { products, productsLen },
+        stylist: { stylists, stylistsLen }
     }
 }
 
 const mapDispatchToProps = dispatch => ({
     databaseOpened: (db) => dispatch(databaseOpened(db)),
-    stylistsGot: (stylists) => dispatch(stylistsGot(stylists))
+    stylistsGot: (stylists, stylistsLen) => dispatch(stylistsGot(stylists, stylistsLen)),
+    productsGot: (products, productsLen) => dispatch(productsGot(products, productsLen))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)

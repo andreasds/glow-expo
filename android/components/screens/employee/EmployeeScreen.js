@@ -54,7 +54,7 @@ class EmployeeScreen extends Component {
                 }
                 case 'stylists': {
                     let stylists = _result[key]
-                    this.props.stylistsGot(stylists)
+                    this.props.stylistsGot(stylists._array, stylists.length)
                     this.setState({ loading: this.state.loading - 1 })
                     break
                 }
@@ -158,15 +158,15 @@ class EmployeeScreen extends Component {
 
 const mapStateToProps = state => {
     const { db } = state.databaseReducers
-    const { stylists } = state.stylistReducers
+    const { stylists, stylistsLen } = state.stylistReducers
     return {
         database: { db },
-        stylist: { stylists }
+        stylist: { stylists, stylistsLen }
     }
 }
 
 const mapDispatchToProps = dispatch => ({
-    stylistsGot: (stylists) => dispatch(stylistsGot(stylists))
+    stylistsGot: (stylists, stylistsLen) => dispatch(stylistsGot(stylists, stylistsLen))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(EmployeeScreen)

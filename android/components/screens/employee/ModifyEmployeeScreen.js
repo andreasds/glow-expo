@@ -34,11 +34,11 @@ class ModifyEmployeeScreen extends Component {
             error: ''
         }
 
-        this._reinitializeAddEmployee = this._reinitializeAddEmployee.bind(this)
+        this._reinitializeModifyEmployee = this._reinitializeModifyEmployee.bind(this)
         this._onCancelButtonPressed = this._onCancelButtonPressed.bind(this)
     }
 
-    _reinitializeAddEmployee(_result) {
+    _reinitializeModifyEmployee(_result) {
         for (let key in _result) {
             switch (key) {
                 case 'insertStylist':
@@ -46,7 +46,7 @@ class ModifyEmployeeScreen extends Component {
                     this.setState({ result: _result[key].result })
                     if (_result[key].result === 'success') {
                         this.setState({ loading: this.state.loading + 1 })
-                        selectAllActiveStylist(this.props.database.db, STYLIST_FIRST_NAME, 'asc', this._reinitializeAddEmployee)
+                        selectAllActiveStylist(this.props.database.db, STYLIST_FIRST_NAME, 'asc', this._reinitializeModifyEmployee)
                     } else if (_result[key].result === 'error') {
                         this.setState({
                             loading: this.state.loading + 1,
@@ -58,7 +58,7 @@ class ModifyEmployeeScreen extends Component {
                 }
                 case 'stylists': {
                     let stylists = _result[key]
-                    this.props.stylistsGot(stylists)
+                    this.props.stylistsGot(stylists._array, stylists.length)
                     this.setState({ loading: this.state.loading - 1 })
 
                     const { goBack } = this.props.navigation
@@ -83,11 +83,18 @@ class ModifyEmployeeScreen extends Component {
 
     _onSaveButtonPressed() {
         if (this.state.stylist.first_name) {
-            this.setState({ loading: this.state.loading + 1 })
+            let stylist = this.state.stylist
+            stylist.first_name = !stylist.first_name ? '' : stylist.first_name.trim()
+            stylist.last_name = !stylist.last_name ? '' : stylist.last_name.trim()
+            this.setState({
+                loading: this.state.loading + 1,
+                stylist
+            })
+
             if (this.state.mode === 'add') {
-                insertStylist(this.props.database.db, this.state.stylist, this._reinitializeAddEmployee)
+                insertStylist(this.props.database.db, this.state.stylist, this._reinitializeModifyEmployee)
             } else if (this.state.mode === 'edit') {
-                updateStylist(this.props.database.db, this.state.stylist, this._reinitializeAddEmployee)
+                updateStylist(this.props.database.db, this.state.stylist, this._reinitializeModifyEmployee)
             }
         } else {
             Alert.alert(
@@ -209,15 +216,13 @@ class ModifyEmployeeScreen extends Component {
 
 const mapStateToProps = state => {
     const { db } = state.databaseReducers
-    const { stylists } = state.stylistReducers
     return {
-        database: { db },
-        stylist: { stylists }
+        database: { db }
     }
 }
 
 const mapDispatchToProps = dispatch => ({
-    stylistsGot: (stylists) => dispatch(stylistsGot(stylists))
+    stylistsGot: (stylists, stylistsLen) => dispatch(stylistsGot(stylists, stylistsLen))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ModifyEmployeeScreen)
