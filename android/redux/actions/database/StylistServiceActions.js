@@ -2,17 +2,16 @@ import {
     createStylistServiceTableQuery,
     insertStylistServiceQuery,
     selectAllStylistServiceByProductQuery,
+    selectAllStylistServiceByStylistQuery,
     updateStylistServiceQuery
 } from '../../../constants/database/stylistsServices'
 
 export const createStylistServiceTable = (db, _callback) => {
     db.transaction(
         (tx) => {
-            console.log('query = ' + JSON.stringify(createStylistServiceTableQuery()))
             tx.executeSql(createStylistServiceTableQuery(), [],
                 (_, success) => {
-                    // _array = []
-                    console.log('success = ' + JSON.stringify(success))
+                    // success = {"insertId":0,"rowsAffected":0,"rows":{"_array":[],"length":0}}
                     _callback({ stylistServiceTable: { result: 'success' } })
                 },
                 (error) => {
@@ -80,7 +79,30 @@ export const selectAllStylistServiceByProduct = (db, product_id, _callback) => {
                     })
                 },
                 (error) => {
-                    _callback({ insertStylistService: { result: 'error', error } })
+                    _callback({ stylistsServicesByProduct: { result: 'error', error } })
+                }
+            )
+        },
+        (error) => { },
+        (success) => { }
+    )
+}
+
+export const selectAllStylistServiceByStylist = (db, stylist_id, _callback) => {
+    db.transaction(
+        (tx) => {
+            tx.executeSql(selectAllStylistServiceByStylistQuery(stylist_id), [],
+                (_, success) => {
+                    // success = {"rowsAffected":0,"rows":{"_array":[{"stylist_id":2,"product_id":11,"price":50000},{"stylist_id":4,"product_id":11,"price":50000}],"length":2}}
+                    _callback({
+                        stylistsServicesByStylist: {
+                            _array: success.rows._array,
+                            length: success.rows.length
+                        }
+                    })
+                },
+                (error) => {
+                    _callback({ stylistsServicesByStylist: { result: 'error', error } })
                 }
             )
         },

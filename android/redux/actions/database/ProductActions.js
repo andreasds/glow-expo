@@ -8,11 +8,9 @@ import {
 export const createProductTable = (db, _callback) => {
     db.transaction(
         (tx) => {
-            console.log('query = ' + createProductTableQuery())
             tx.executeSql(createProductTableQuery(), [],
                 (_, success) => {
-                    // _array = []
-                    console.log('success = ' + JSON.stringify(success))
+                    // success = {"insertId":0,"rowsAffected":0,"rows":{"_array":[],"length":0}}
                     _callback({ productTable: { result: 'success' } })
                 },
                 (error) => {
@@ -81,7 +79,7 @@ export const selectAllPackageByParent = (db, parent_product_id, _callback) => {
                 },
                 (error) => {
                     _callback({
-                        stylists: {
+                        packagesByParent: {
                             _array: null,
                             length: 0
                         }

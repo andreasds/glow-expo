@@ -11,11 +11,9 @@ import { UPDATE_PRODUCT } from '../types'
 export const createProductDetailTable = (db, _callback) => {
     db.transaction(
         (tx) => {
-            console.log('query = ' + JSON.stringify(createProductDetailTableQuery()))
             tx.executeSql(createProductDetailTableQuery(), [],
                 (_, success) => {
-                    // _array = []
-                    console.log('success = ' + JSON.stringify(success))
+                    // success = {"insertId":0,"rowsAffected":0,"rows":{"_array":[],"length":0}}
                     _callback({ productDetailTable: { result: 'success' } })
                 },
                 (error) => {
@@ -104,7 +102,12 @@ export const selectAllProduct = (db, sort, order, _callback) => {
                     })
                 },
                 (error) => {
-                    _callback({ products: null })
+                    _callback({
+                        products: {
+                            _array: null,
+                            length: 0
+                        }
+                    })
                 }
             )
         },
@@ -127,7 +130,12 @@ export const selectAllActiveProduct = (db, sort, order, _callback) => {
                     })
                 },
                 (error) => {
-                    _callback({ products: null })
+                    _callback({
+                        products: {
+                            _array: null,
+                            length: 0
+                        }
+                    })
                 }
             )
         },

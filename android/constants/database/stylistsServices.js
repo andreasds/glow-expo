@@ -38,3 +38,8 @@ export const selectAllStylistServiceByProductQuery = (product_id) => {
     return 'SELECT * FROM ' + STYLISTS_SERVICES_SCHEMA +
         ' WHERE ' + PRODUCT_ID + ' = ' + product_id
 }
+
+export const selectAllStylistServiceByStylistQuery = (stylist_id) => {
+    return 'SELECT * FROM ' + STYLISTS_SERVICES_SCHEMA +
+        ' WHERE ' + STYLIST_ID + ' = ' + stylist_id
+}

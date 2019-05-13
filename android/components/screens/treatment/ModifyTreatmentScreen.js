@@ -153,6 +153,7 @@ class ModifyTreatmentScreen extends Component {
                     let products = _result[key]
                     this.props.productsGot(products._array, products.length)
                     this.setState({ loading: this.state.loading - 1 })
+
                     const { goBack } = this.props.navigation
                     goBack()
                     break
@@ -330,7 +331,11 @@ class ModifyTreatmentScreen extends Component {
                             /> :
                             null
                     }
-                    <Text style={textStyle}>Employees</Text>
+                    {
+                        this.props.stylist.stylistsLen ?
+                            <Text style={textStyle}>Employees</Text> :
+                            null
+                    }
                     <FlatList
                         data={this.props.stylist.stylists}
                         extraData={this.state}

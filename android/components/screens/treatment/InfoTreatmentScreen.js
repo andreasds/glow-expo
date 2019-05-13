@@ -7,8 +7,6 @@ import { STYLIST_FIRST_NAME, STYLIST_ID, STYLIST_LAST_NAME } from '../../../cons
 
 import { intToNumberCurrencyString } from '../../../constants/utils/number'
 
-import { productsGot } from '../../../redux/actions/database/ProductDetailActions'
-
 import { buttonContainerStyle, buttonStyle, buttonTextStyle, highlightButtonColor } from '../../../constants/styles/treatment'
 import { containerStyle, scrollContainerStyle } from '../../../constants/styles/treatment'
 import { listContainer, listStyle, listTextStyle } from '../../../constants/styles/treatment'
@@ -128,8 +126,6 @@ const mapStateToProps = state => {
     }
 }
 
-const mapDispatchToProps = dispatch => ({
-    productsGot: (products, productsLen) => dispatch(productsGot(products, productsLen))
-})
+const mapDispatchToProps = dispatch => ({})
 
 export default connect(mapStateToProps, mapDispatchToProps)(InfoTreatmentScreen)

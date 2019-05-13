@@ -4,8 +4,8 @@ export const insertCurrentVersion = (db, version, _callback) => {
     db.transaction(
         (tx) => {
             tx.executeSql(insertCurrentVersionQuery(version), [],
-                (_, { rows: { _array } }) => {
-                    // _array = []
+                (_, success) => {
+                    // success = {"insertId":0,"rowsAffected":0,"rows":{"_array":[],"length":0}}
                     _callback({ currentVersion: { result: 'success' } })
                 },
                 (error) => {

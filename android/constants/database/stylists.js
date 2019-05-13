@@ -29,7 +29,7 @@ export const updateStylistQuery = (stylist) => {
         ' SET ' +
         STYLIST_FIRST_NAME + ' = \'' + stylist.first_name + '\', ' +
         STYLIST_LAST_NAME + ' = \'' + stylist.last_name + '\', ' +
-        STYLIST_ACTIVE + ' = \'' + stylist.active + '\' ' +
+        STYLIST_ACTIVE + ' = \'' + stylist.active + '\'' +
         ' WHERE ' +
         STYLIST_ID + ' = ' + stylist.stylist_id
 }

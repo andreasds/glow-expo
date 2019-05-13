@@ -248,7 +248,7 @@ class TreatmentScreen extends Component {
                         <View style={listContainer}>
                             <View style={containerStyle2}>
                                 <Text style={listTextStyle}>{item[PRODUCT_NAME]}</Text>
-                                <Text style={listTextStyle}>{'[ ' + intToNumberCurrencyString(item[PRODUCT_PRICE], 0) + ' ]'}</Text>
+                                <Text style={listTextStyle}>{'[ Rp ' + intToNumberCurrencyString(item[PRODUCT_PRICE], 0) + ',00 ]'}</Text>
                             </View>
                             <View style={modifyButtonContainerStyle}>
                                 <TouchableHighlight

@@ -4,8 +4,8 @@ export const createSaleDetailTable = (db, _callback) => {
     db.transaction(
         (tx) => {
             tx.executeSql(createSaleDetailTableQuery(), [],
-                (_, { rows: { _array } }) => {
-                    // _array = []
+                (_, success) => {
+                    // success = {"insertId":0,"rowsAffected":0,"rows":{"_array":[],"length":0}}
                     _callback({ saleDetailTable: { result: 'success' } })
                 },
                 (error) => {

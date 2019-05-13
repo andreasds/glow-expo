@@ -55,8 +55,14 @@ export const listContainer = {
 }
 
 export const listStyle = {
+    borderRadius: width * 0.01,
     flex: 1,
     marginVertical: width * 0.01
+}
+
+export const listStyle2 = {
+    ...listStyle,
+    backgroundColor: 'white'
 }
 
 export const listTextStyle = {
@@ -72,7 +78,7 @@ export const modifyButtonContainerStyle = {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    maxWidth: 2 * width * 0.11
+    maxWidth: 3 * width * 0.11
 }
 
 export const modifyButtonStyle = {
@@ -82,6 +88,17 @@ export const modifyButtonStyle = {
     justifyContent: 'center',
     margin: width * 0.005,
     width: width * 0.1
+}
+
+export const numberInputStyle = {
+    backgroundColor: 'darkgrey',
+    borderRadius: width * 0.015,
+    fontSize: width * 0.06,
+    height: width * 0.1,
+    padding: width * 0.02,
+    textAlign: 'right',
+    textAlignVertical: 'center',
+    width: width * 0.33
 }
 
 export const scrollContainerStyle = {

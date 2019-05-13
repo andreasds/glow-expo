@@ -11,11 +11,9 @@ import { UPDATE_STYLIST } from '../types'
 export const createStylistTable = (db, _callback) => {
     db.transaction(
         (tx) => {
-            console.log('query = ' + JSON.stringify(createStylistTableQuery()))
             tx.executeSql(createStylistTableQuery(), [],
                 (_, success) => {
-                    // _array = []
-                    console.log('success = ' + JSON.stringify(success))
+                    // success = {"insertId":0,"rowsAffected":0,"rows":{"_array":[],"length":0}}
                     _callback({ stylistTable: { result: 'success' } })
                 },
                 (error) => {
@@ -54,12 +52,9 @@ export const insertStylist = (db, stylist, _callback) => {
 export const updateStylist = (db, stylist, _callback) => {
     db.transaction(
         (tx) => {
-            console.log('stylist = ' + JSON.stringify(stylist))
-            console.log('query = ' + JSON.stringify(updateStylistQuery(stylist)))
             tx.executeSql(updateStylistQuery(stylist), [],
                 (_, success) => {
-                    // success = []
-                    console.log('success = ' + JSON.stringify(success))
+                    // success = {"rowsAffected":1,"rows":{"_array":[],"length":0}}
                     _callback({ updateStylist: { result: 'success' } })
                 },
                 (error) => {
@@ -75,12 +70,9 @@ export const updateStylist = (db, stylist, _callback) => {
 export const deleteStylist = (db, stylist, _callback) => {
     db.transaction(
         (tx) => {
-            console.log('stylist = ' + JSON.stringify(stylist))
-            console.log('query = ' + JSON.stringify(deleteStylistQuery(stylist)))
             tx.executeSql(deleteStylistQuery(stylist), [],
                 (_, success) => {
-                    // success = []
-                    console.log('success = ' + JSON.stringify(success))
+                    // success = {"rowsAffected":1,"rows":{"_array":[],"length":0}}
                     _callback({ deleteStylist: { result: 'success' } })
                 },
                 (error) => {
