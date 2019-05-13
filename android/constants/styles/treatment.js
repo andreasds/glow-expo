@@ -57,6 +57,12 @@ export const containerStyle = {
     padding: width * 0.03
 }
 
+export const containerStyle2 = {
+    ...containerStyle,
+    backgroundColor: 'lightslategrey',
+    padding: 0
+}
+
 export const iconStyle = {
     textAlign: 'center',
     textAlignVertical: 'center'
@@ -89,7 +95,7 @@ export const listTextStyle = {
     flex: 1,
     fontSize: width * 0.06,
     minHeight: width * 0.1,
-    margin: width * 0.01,
+    marginHorizontal: width * 0.01,
     textAlignVertical: 'center'
 }
 
@@ -97,7 +103,7 @@ export const modifyButtonContainerStyle = {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    maxWidth: 2 * width * 0.11
+    maxWidth: 3 * width * 0.11
 }
 
 export const modifyButtonStyle = {

@@ -4,16 +4,17 @@ import { connect } from 'react-redux'
 import { FontAwesome } from '@expo/vector-icons'
 
 import { CHILD_PRODUCT_ID } from '../../../constants/database/products'
-import { PRODUCT_ID, PRODUCT_NAME, PRODUCT_PACKAGE } from '../../../constants/database/productsDetails'
+import { PRODUCT_ID, PRODUCT_NAME, PRODUCT_PACKAGE, PRODUCT_PRICE } from '../../../constants/database/productsDetails'
 import { STYLIST_ID } from '../../../constants/database/stylists'
 import { STYLISTS_SERVICES_PRICE } from '../../../constants/database/stylistsServices'
 
 import { loadingScreen } from '../../../constants/LoadingScreen'
+import { intToNumberCurrencyString } from '../../../constants/utils/number'
 
 import { productsGot } from '../../../redux/actions/database/ProductDetailActions'
 
 import { buttonContainerStyle, buttonStyle, buttonTextStyle, highlightButtonColor } from '../../../constants/styles/treatment'
-import { containerStyle } from '../../../constants/styles/treatment'
+import { containerStyle, containerStyle2 } from '../../../constants/styles/treatment'
 import { iconStyle } from '../../../constants/styles/treatment'
 import { listContainer, listStyle, listTextStyle } from '../../../constants/styles/treatment'
 import { modifyButtonContainerStyle, modifyButtonStyle } from '../../../constants/styles/treatment'
@@ -33,6 +34,7 @@ class TreatmentScreen extends Component {
         this.state = {
             loading: 0,
             product: {},
+            process: '',
             result: '',
             error: ''
         }
@@ -61,10 +63,29 @@ class TreatmentScreen extends Component {
                         selectAllPackageByParent(this.props.database.db, product[PRODUCT_ID], this._reinitializeTreatment)
                     } else {
                         const { navigate } = this.props.navigation
-                        navigate('EditTreatment', {
-                            mode: 'edit',
-                            product
-                        })
+                        switch (this.state.process) {
+                            case 'info':
+                            case 'edit':
+                                let process = this.state.process
+                                this.setState({ process: '' })
+                                if (process === 'edit') {
+                                    navigate('EditTreatment', {
+                                        mode: 'edit',
+                                        product: this.state.product
+                                    })
+                                } else {
+                                    navigate('InfoTreatment', {
+                                        product: this.state.product
+                                    })
+                                }
+                                break
+                            default:
+                                this.setState({
+                                    loading: this.state.loading + 1,
+                                    error: 'Failed to ' + this.state.process + ' process at get stylist services'
+                                })
+                                break
+                        }
                     }
                     break
                 }
@@ -81,16 +102,38 @@ class TreatmentScreen extends Component {
                         product
                     })
                     const { navigate } = this.props.navigation
-                    navigate('EditTreatment', {
-                        mode: 'edit',
-                        product
-                    })
+                    switch (this.state.process) {
+                        case 'info':
+                        case 'edit':
+                            let process = this.state.process
+                            this.setState({ process: '' })
+                            if (process === 'edit') {
+                                navigate('EditTreatment', {
+                                    mode: 'edit',
+                                    product: this.state.product
+                                })
+                            } else {
+                                navigate('InfoTreatment', {
+                                    product: this.state.product
+                                })
+                            }
+                            break
+                        default:
+                            this.setState({
+                                loading: this.state.loading + 1,
+                                error: 'Failed to ' + this.state.process + ' process at get package items'
+                            })
+                            break
+                    }
                     break
                 }
                 case 'deleteProduct': {
                     this.setState({ result: _result[key].result })
                     if (_result[key].result === 'success') {
-                        this.setState({ loading: this.state.loading + 1 })
+                        this.setState({
+                            loading: this.state.loading + 1,
+                            result: ''
+                        })
                         selectAllActiveProduct(this.props.database.db, PRODUCT_NAME, 'asc', this._reinitializeTreatment)
                     } else if (_result[key].result === 'error') {
                         this.setState({
@@ -104,7 +147,11 @@ class TreatmentScreen extends Component {
                 case 'products': {
                     let products = _result[key]
                     this.props.productsGot(products._array, products.length)
-                    this.setState({ loading: this.state.loading - 1 })
+                    this.setState({
+                        loading: this.state.loading - 1,
+                        product: {},
+                        process: ''
+                    })
                     break
                 }
                 default: {
@@ -122,10 +169,20 @@ class TreatmentScreen extends Component {
         })
     }
 
+    _onInfoTreatmentPressed(product) {
+        this.setState({
+            loading: this.state.loading + 1,
+            product,
+            process: 'info'
+        })
+        selectAllStylistServiceByProduct(this.props.database.db, product[PRODUCT_ID], this._reinitializeTreatment)
+    }
+
     _onEditTreatmentPressed(product) {
         this.setState({
             loading: this.state.loading + 1,
-            product
+            product,
+            process: 'edit'
         })
         selectAllStylistServiceByProduct(this.props.database.db, product[PRODUCT_ID], this._reinitializeTreatment)
     }
@@ -133,13 +190,14 @@ class TreatmentScreen extends Component {
     _onRemoveTreatmentPressed(product) {
         Alert.alert(
             '',
-            'Are you sure you want to delete ' + product.name + '?',
+            'Are you sure you want to delete ' + product[PRODUCT_NAME] + '?',
             [
                 {
                     text: 'OK', onPress: () => {
                         this.setState({
                             loading: this.state.loading + 1,
                             product,
+                            process: 'delete',
                             result: ''
                         })
                         deleteProduct(this.props.database.db, product, this._reinitializeTreatment)
@@ -156,12 +214,26 @@ class TreatmentScreen extends Component {
         // console.log('state = ' + JSON.stringify(this.state))
 
         if (this.state.loading) {
-            if (this.state.result === '') {
-                return loadingScreen('Delete ' + this.state.product.name + ' in database', '')
-            } else if (this.state.result === 'error') {
-                return loadingScreen('ERROR Delete ' + this.state.product.name + ' in database', this.state.error)
-            } else {
-                return loadingScreen('Updating list treatments', '')
+            switch (this.state.process) {
+                case 'info':
+                case 'edit':
+                    if (this.state.result === '') {
+                        return loadingScreen('Get detail ' + this.state.product[PRODUCT_NAME] + ' in database', '')
+                    } else if (this.state.result === 'error') {
+                        return loadingScreen('ERROR Get detail ' + this.state.product[PRODUCT_NAME] + ' in database', this.state.error)
+                    } else {
+                        return loadingScreen('ERROR Get detail ' + this.state.product[PRODUCT_NAME] + ' in database', 'Unknown process in ' + this.state.process + ' data')
+                    }
+                case 'delete':
+                    if (this.state.result === '') {
+                        return loadingScreen('Delete ' + this.state.product[PRODUCT_NAME] + ' in database', '')
+                    } else if (this.state.result === 'error') {
+                        return loadingScreen('ERROR Delete ' + this.state.product[PRODUCT_NAME] + ' in database', this.state.error)
+                    } else {
+                        return loadingScreen('ERROR Delete ' + this.state.product[PRODUCT_NAME] + ' in database', 'Unknown process in delete data')
+                    }
+                default:
+                    return loadingScreen('ERROR ' + this.state.process + ': product ' + this.state.product[PRODUCT_NAME], this.state.error)
             }
         }
 
@@ -174,8 +246,17 @@ class TreatmentScreen extends Component {
                     style={listStyle}
                     renderItem={({ item, index }) => (
                         <View style={listContainer}>
-                            <Text style={listTextStyle}>{item[PRODUCT_NAME]}</Text>
+                            <View style={containerStyle2}>
+                                <Text style={listTextStyle}>{item[PRODUCT_NAME]}</Text>
+                                <Text style={listTextStyle}>{'[ ' + intToNumberCurrencyString(item[PRODUCT_PRICE], 0) + ' ]'}</Text>
+                            </View>
                             <View style={modifyButtonContainerStyle}>
+                                <TouchableHighlight
+                                    onPress={() => this._onInfoTreatmentPressed(item)}
+                                    style={modifyButtonStyle}
+                                    underlayColor={highlightButtonColor}>
+                                    <FontAwesome color='white' name='info' size={30} style={iconStyle} />
+                                </TouchableHighlight>
                                 <TouchableHighlight
                                     onPress={() => this._onEditTreatmentPressed(item)}
                                     style={modifyButtonStyle}
