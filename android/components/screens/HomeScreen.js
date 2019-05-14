@@ -7,7 +7,7 @@ import { DATABASE_NAME } from '../../constants/database/config'
 import { STYLIST_FIRST_NAME } from '../../constants/database/stylists'
 import { PRODUCT_NAME } from '../../constants/database/productsDetails'
 
-import { buttonStyle, highlightButtonColor } from '../../constants/styles/home'
+import { buttonStyle, buttonTextStyle, highlightButtonColor } from '../../constants/styles/home'
 import { containerStyle } from '../../constants/styles/home'
 
 import { loadingScreen } from '../../constants/LoadingScreen'
@@ -208,33 +208,25 @@ class HomeScreen extends Component {
                     onPress={() => this._onCustomerButtonPressed()}
                     style={buttonStyle}
                     underlayColor={highlightButtonColor}>
-                    <View>
-                        <Text>CUSTOMER</Text>
-                    </View>
+                    <Text style={buttonTextStyle}>CUSTOMER</Text>
                 </TouchableHighlight>
                 <TouchableHighlight
                     onPress={() => this._onEmployeeButtonPressed()}
                     style={buttonStyle}
                     underlayColor={highlightButtonColor}>
-                    <View>
-                        <Text>EMPLOYEE</Text>
-                    </View>
+                    <Text style={buttonTextStyle}>EMPLOYEE</Text>
                 </TouchableHighlight>
                 <TouchableHighlight
                     onPress={() => this._onTreatmentButtonPressed()}
                     style={buttonStyle}
                     underlayColor={highlightButtonColor}>
-                    <View>
-                        <Text>TREATMENT</Text>
-                    </View>
+                    <Text style={buttonTextStyle}>TREATMENT</Text>
                 </TouchableHighlight>
                 <TouchableHighlight
                     onPress={() => this._onPrinterButtonPressed()}
                     style={buttonStyle}
                     underlayColor={highlightButtonColor}>
-                    <View>
-                        <Text>PRINTER</Text>
-                    </View>
+                    <Text style={buttonTextStyle}>PRINTER</Text>
                 </TouchableHighlight>
             </View>
         )

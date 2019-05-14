@@ -15,6 +15,15 @@ export const buttonStyle = {
     width: width * (1 - (6 * padding)) / 2,
 }
 
+export const buttonTextStyle = {
+    color: 'white',
+    flex: 1,
+    fontSize: width * 0.06,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    textAlignVertical: 'center'
+}
+
 export const containerStyle = {
     backgroundColor: 'black',
     flex: 1,
