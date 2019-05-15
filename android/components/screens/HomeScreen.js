@@ -158,7 +158,8 @@ class HomeScreen extends Component {
     }
 
     _onCustomerButtonPressed() {
-
+        const { navigate } = this.props.navigation
+        navigate('Customer')
     }
 
     _onEmployeeButtonPressed() {
