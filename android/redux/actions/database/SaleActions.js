@@ -1,4 +1,5 @@
 import { createSaleTableQuery } from '../../../constants/database/sales'
+import { UPDATE_SALE } from '../types'
 
 export const createSaleTable = (db, _callback) => {
     db.transaction(
@@ -17,3 +18,11 @@ export const createSaleTable = (db, _callback) => {
         (success) => { }
     )
 }
+
+export const salesGot = (sales, salesLen) => ({
+    type: UPDATE_SALE,
+    payload: {
+        sales,
+        salesLen
+    }
+})
