@@ -33,10 +33,8 @@ class ModifyTreatmentScreen extends Component {
         const { navigation } = this.props
         let mode = navigation.getParam('mode', '')
         let product = navigation.getParam('product', {})
-        if (mode === 'add') {
-            product.stylistsServices = {}
-            product.packageItem = {}
-        }
+        if (mode === 'add') { product.stylistsServices = {} }
+        if (!product.packageItem) { product.packageItem = {} }
 
         let products = []
         for (i = 0; i < props.product.productsLen; i++) {
