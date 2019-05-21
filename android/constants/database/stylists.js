@@ -14,24 +14,32 @@ export const createStylistTableQuery = () => {
         ')'
 }
 
+export const getStylistQuery = (stylist) => {
+    return 'SELECT * FROM ' + STYLISTS_SCHEMA +
+        ' WHERE ' +
+        STYLIST_FIRST_NAME + ' = \'' + stylist[STYLIST_FIRST_NAME] + '\'' + ' AND ' +
+        STYLIST_LAST_NAME + ' = \'' + stylist[STYLIST_LAST_NAME] + '\'' + ' AND ' +
+        STYLIST_ACTIVE + ' = \'Y\''
+}
+
 export const insertStylistQuery = (stylist) => {
     return 'INSERT INTO ' + STYLISTS_SCHEMA + ' (' +
         STYLIST_FIRST_NAME + ', ' +
         STYLIST_LAST_NAME +
         ') VALUES (' +
-        '\'' + stylist.first_name + '\', ' +
-        '\'' + stylist.last_name + '\'' +
+        '\'' + stylist[STYLIST_FIRST_NAME] + '\', ' +
+        '\'' + stylist[STYLIST_LAST_NAME] + '\'' +
         ')'
 }
 
 export const updateStylistQuery = (stylist) => {
     return 'UPDATE ' + STYLISTS_SCHEMA +
         ' SET ' +
-        STYLIST_FIRST_NAME + ' = \'' + stylist.first_name + '\', ' +
-        STYLIST_LAST_NAME + ' = \'' + stylist.last_name + '\', ' +
-        STYLIST_ACTIVE + ' = \'' + stylist.active + '\'' +
+        STYLIST_FIRST_NAME + ' = \'' + stylist[STYLIST_FIRST_NAME] + '\', ' +
+        STYLIST_LAST_NAME + ' = \'' + stylist[STYLIST_LAST_NAME] + '\', ' +
+        STYLIST_ACTIVE + ' = \'' + stylist[STYLIST_ACTIVE] + '\'' +
         ' WHERE ' +
-        STYLIST_ID + ' = ' + stylist.stylist_id
+        STYLIST_ID + ' = ' + stylist[STYLIST_ID]
 }
 
 export const deleteStylistQuery = (stylist) => {
@@ -39,7 +47,7 @@ export const deleteStylistQuery = (stylist) => {
         ' SET ' +
         STYLIST_ACTIVE + ' = \'N\'' +
         ' WHERE ' +
-        STYLIST_ID + ' = ' + stylist.stylist_id
+        STYLIST_ID + ' = ' + stylist[STYLIST_ID]
 }
 
 export const selectAllStylistQuery = (sort, order) => {

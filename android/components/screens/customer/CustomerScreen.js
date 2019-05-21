@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { loadingScreen } from '../../../constants/LoadingScreen'
 
 import { salesGot } from '../../../redux/actions/database/SaleActions'
+import { selectAllStylistService } from '../../../redux/actions/database/StylistServiceActions'
 
 import { buttonContainerStyle, buttonStyle, buttonTextStyle, highlightButtonColor } from '../../../constants/styles/employee'
 import { containerStyle } from '../../../constants/styles/customer'
@@ -25,13 +26,68 @@ class CustomerScreen extends Component {
             result: '',
             error: ''
         }
+
+        this._reinitializeCustomer = this._reinitializeCustomer.bind(this)
+    }
+
+    _reinitializeCustomer(_result) {
+        for (let key in _result) {
+            switch (key) {
+                case 'stylistsServices':
+                    let stylistsServices = _result[key]._array
+                    this.setState({ loading: this.state.loading - 1 })
+
+                    const { navigate } = this.props.navigation
+                    switch (this.state.process) {
+                        case 'add':
+                            // let process = this.state.process
+                            this.setState({ process: '' })
+                            navigate('AddCustomer', {
+                                mode: 'add',
+                                stylistsServices
+                            })
+                            break
+                        // case 'info':
+                        // case 'edit':
+                        //     let process = this.state.process
+                        //     this.setState({ process: '' })
+                        //     if (process === 'edit') {
+                        //         navigate('EditEmployee', {
+                        //             mode: 'edit',
+                        //             stylist: this.state.stylist
+                        //         })
+                        //     } else {
+                        //         navigate('InfoEmployee', {
+                        //             stylist: this.state.stylist
+                        //         })
+                        //     }
+                        //     break
+                        default:
+                            this.setState({
+                                loading: this.state.loading + 1,
+                                error: 'Failed to ' + this.state.process + ' process at get stylist services'
+                            })
+                            break
+                    }
+                    break
+                default: {
+                    console.log('Unprocessed _result[\'' + key + '\'] = ' + JSON.stringify(_result[key]))
+                    break
+                }
+            }
+        }
     }
 
     _onAddCustomerPressed() {
-        const { navigate } = this.props.navigation
-        navigate('AddCustomer', {
-            mode: 'add'
+        this.setState({
+            loading: this.state.loading + 1,
+            process: 'add'
         })
+        selectAllStylistService(this.props.database.db, this._reinitializeCustomer)
+        // const { navigate } = this.props.navigation
+        // navigate('AddCustomer', {
+        //     mode: 'add'
+        // })
     }
 
     render() {

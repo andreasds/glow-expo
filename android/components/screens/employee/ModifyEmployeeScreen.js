@@ -3,7 +3,7 @@ import { Alert, BackHandler, FlatList, ScrollView, Text, TextInput, TouchableHig
 import { connect } from 'react-redux'
 
 import { PRODUCT_ID, PRODUCT_NAME, PRODUCT_PRICE } from '../../../constants/database/productsDetails'
-import { STYLIST_FIRST_NAME, STYLIST_ID } from '../../../constants/database/stylists'
+import { STYLIST_FIRST_NAME, STYLIST_ID, STYLIST_LAST_NAME } from '../../../constants/database/stylists'
 
 import { loadingScreen } from '../../../constants/LoadingScreen'
 import { intToNumberCurrencyString, numberCurrencyStringToInt } from '../../../constants/utils/number'
@@ -240,31 +240,31 @@ class ModifyEmployeeScreen extends Component {
                             <Text style={titleTextStyle}>EDIT EMPLOYEE</Text> :
                             <Text style={titleTextStyle}>UNKNOWN MODE</Text>
                 }
-                <ScrollView style={{ ...scrollContainerStyle }}>
+                <ScrollView style={scrollContainerStyle}>
                     <Text style={textStyle}>First Name *</Text>
                     <TextInput
                         maxLength={50}
                         onChangeText={(text) => {
                             let stylist = this.state.stylist
-                            stylist.first_name = text
+                            stylist[STYLIST_FIRST_NAME] = text
                             this.setState({ stylist })
                         }}
                         selectTextOnFocus={true}
                         style={textInputStyle}
                         placeholder='First Name'
-                        value={this.state.stylist.first_name} />
+                        value={this.state.stylist[STYLIST_FIRST_NAME]} />
                     <Text style={textStyle}>Last Name</Text>
                     <TextInput
                         maxLength={50}
                         onChangeText={(text) => {
                             let stylist = this.state.stylist
-                            stylist.last_name = text
+                            stylist[STYLIST_LAST_NAME] = text
                             this.setState({ stylist })
                         }}
                         selectTextOnFocus={true}
                         style={textInputStyle}
                         placeholder='Last Name'
-                        value={this.state.stylist.last_name} />
+                        value={this.state.stylist[STYLIST_LAST_NAME]} />
                     {
                         this.props.product.productsLen ?
                             <Text style={textStyle}>Treatment</Text> :

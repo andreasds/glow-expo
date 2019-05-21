@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 
 import { SQLite } from 'expo'
 import { DATABASE_NAME } from '../../constants/database/config'
-import { STYLIST_FIRST_NAME } from '../../constants/database/stylists'
+import { STYLIST_FIRST_NAME, STYLIST_LAST_NAME } from '../../constants/database/stylists'
 import { PRODUCT_NAME } from '../../constants/database/productsDetails'
 
 import { buttonStyle, buttonTextStyle, highlightButtonColor } from '../../constants/styles/home'
@@ -21,7 +21,7 @@ import { createProductDetailTable, selectAllActiveProduct } from '../../redux/ac
 import { createSaleTable } from '../../redux/actions/database/SaleActions'
 import { createSaleDetailTable } from '../../redux/actions/database/SaleDetailActions'
 import { createSaleProductTable } from '../../redux/actions/database/SaleProductActions'
-import { createStylistTable, selectAllActiveStylist } from '../../redux/actions/database/StylistActions'
+import { createStylistTable, getStylist, insertStylist, selectAllActiveStylist } from '../../redux/actions/database/StylistActions'
 import { createStylistServiceTable } from '../../redux/actions/database/StylistServiceActions'
 import { createVersionTable, getLastVersion, insertCurrentVersion } from '../../redux/actions/database/VersionActions'
 
@@ -61,8 +61,13 @@ class HomeScreen extends Component {
                         // TODO: database modification
                     } else {
                         this.setState({ loading: this.state.loading + 2 })
+
+                        let stylist = {}
+                        stylist[STYLIST_FIRST_NAME] = '- Choose Employee -'
+                        stylist[STYLIST_LAST_NAME] = ''
+                        getStylist(this.props.database.db, stylist, this._reinitializeHome)
+
                         selectAllActiveProduct(this.props.database.db, PRODUCT_NAME, 'asc', this._reinitializeHome)
-                        selectAllActiveStylist(this.props.database.db, STYLIST_FIRST_NAME, 'asc', this._reinitializeHome)
                     }
                     this.setState({ loading: this.state.loading - 1 })
                     break
@@ -105,7 +110,10 @@ class HomeScreen extends Component {
                     console.log('Create stylist table ' + JSON.stringify(_result[key].result))
 
                     this.setState({ loading: this.state.loading + 1 })
-                    selectAllActiveStylist(this.props.database.db, STYLIST_FIRST_NAME, 'asc', this._reinitializeHome)
+                    let stylist = {}
+                    stylist[STYLIST_FIRST_NAME] = '- Choose Employee -'
+                    stylist[STYLIST_LAST_NAME] = ''
+                    insertStylist(this.props.database.db, stylist, this._reinitializeHome)
 
                     this.setState({ loading: this.state.loading - 1 })
                     break
@@ -122,6 +130,32 @@ class HomeScreen extends Component {
                     let currentVersion = require('../../../app.json').expo.version
                     insertCurrentVersion(this.props.database.db, currentVersion, this._reinitializeHome)
 
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'insertStylist': {
+                    if (_result[key].result === 'error') {
+                        console.log('ERROR Insert stylist = ' + JSON.stringify(_result[key].error))
+                    }
+
+                    this.setState({ loading: this.state.loading + 1 })
+                    selectAllActiveStylist(this.props.database.db, STYLIST_FIRST_NAME, 'asc', this._reinitializeHome)
+
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'stylist': {
+                    let stylist = _result[key]
+                    if (stylist.length === 1) {
+                        this.setState({ loading: this.state.loading + 1 })
+                        selectAllActiveStylist(this.props.database.db, STYLIST_FIRST_NAME, 'asc', this._reinitializeHome)
+                    } else if (stylist.length === 0) {
+                        this.setState({ loading: this.state.loading + 1 })
+                        let stylist = {}
+                        stylist[STYLIST_FIRST_NAME] = '- Choose Employee -'
+                        stylist[STYLIST_LAST_NAME] = ''
+                        insertStylist(this.props.database.db, stylist, this._reinitializeHome)
+                    }
                     this.setState({ loading: this.state.loading - 1 })
                     break
                 }

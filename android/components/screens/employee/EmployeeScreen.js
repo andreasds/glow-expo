@@ -163,6 +163,16 @@ class EmployeeScreen extends Component {
         )
     }
 
+    _filterListStylists() {
+        let stylists = []
+        for (stylistIndex in this.props.stylist.stylists) {
+            if (this.props.stylist.stylists[stylistIndex][STYLIST_FIRST_NAME] !== '- Choose Employee -') {
+                stylists.push(this.props.stylist.stylists[stylistIndex])
+            }
+        }
+        return stylists
+    }
+
     render() {
         // console.log('props = ' + JSON.stringify(this.props))
         // console.log('state = ' + JSON.stringify(this.state))
@@ -191,11 +201,12 @@ class EmployeeScreen extends Component {
             }
         }
 
+        let stylists = this._filterListStylists()
         return (
             <View style={containerStyle}>
                 <Text style={titleTextStyle}>EMPLOYEES LIST</Text>
                 <FlatList
-                    data={this.props.stylist.stylists}
+                    data={stylists}
                     keyExtractor={(stylistItem, stylistIndex) => stylistIndex.toString()}
                     style={listStyle}
                     renderItem={({ item, index }) => (

@@ -1,6 +1,7 @@
 import {
     createStylistServiceTableQuery,
     insertStylistServiceQuery,
+    selectAllStylistServiceQuery,
     selectAllStylistServiceByProductQuery,
     selectAllStylistServiceByStylistQuery,
     updateStylistServiceQuery
@@ -57,6 +58,29 @@ export const updateStylistService = (db, stylistService, _callback) => {
                 },
                 (error) => {
                     _callback({ updateStylistService: { result: 'error', error } })
+                }
+            )
+        },
+        (error) => { },
+        (success) => { }
+    )
+}
+
+export const selectAllStylistService = (db, _callback) => {
+    db.transaction(
+        (tx) => {
+            tx.executeSql(selectAllStylistServiceQuery(), [],
+                (_, success) => {
+                    // success = {"rowsAffected":0,"rows":{"_array":[{"stylist_id":1,"product_id":1,"price":25000},{"stylist_id":2,"product_id":1,"price":25000},{"stylist_id":3,"product_id":1,"price":25000},{"stylist_id":4,"product_id":1,"price":35000},{"stylist_id":5,"product_id":1,"price":35000}],"length":5}}
+                    _callback({
+                        stylistsServices: {
+                            _array: success.rows._array,
+                            length: success.rows.length
+                        }
+                    })
+                },
+                (error) => {
+                    _callback({ stylistsServices: { result: 'error', error } })
                 }
             )
         },

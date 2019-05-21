@@ -1,6 +1,7 @@
 import {
     createStylistTableQuery,
     deleteStylistQuery,
+    getStylistQuery,
     insertStylistQuery,
     selectAllStylistQuery,
     selectAllActiveStylistQuery,
@@ -18,6 +19,34 @@ export const createStylistTable = (db, _callback) => {
                 },
                 (error) => {
                     _callback({ stylistTable: { result: 'error', error } })
+                }
+            )
+        },
+        (error) => { },
+        (success) => { }
+    )
+}
+
+export const getStylist = (db, stylist, _callback) => {
+    db.transaction(
+        (tx) => {
+            tx.executeSql(getStylistQuery(stylist), [],
+                (_, success) => {
+                    // success = {"rowsAffected":0,"rows":{"_array":[{"stylist_id":5,"first_name":"- Choose Employee -","last_name":"","active":"Y"}],"length":1}}
+                    _callback({
+                        stylist: {
+                            _array: success.rows._array,
+                            length: success.rows.length
+                        }
+                    })
+                },
+                (error) => {
+                    _callback({
+                        stylist: {
+                            _array: null,
+                            length: 0
+                        }
+                    })
                 }
             )
         },

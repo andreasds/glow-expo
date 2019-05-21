@@ -39,7 +39,9 @@ class ModifyTreatmentScreen extends Component {
         let products = []
         for (i = 0; i < props.product.productsLen; i++) {
             if (props.product.products[i][PRODUCT_ID] !== product[PRODUCT_ID]) {
-                products.push(props.product.products[i])
+                if (props.product.products[i][PRODUCT_PACKAGE] === 'N') {
+                    products.push(props.product.products[i])
+                }
             }
         }
 
@@ -225,6 +227,16 @@ class ModifyTreatmentScreen extends Component {
         return true
     }
 
+    _filterListStylists() {
+        let stylists = []
+        for (stylistIndex in this.props.stylist.stylists) {
+            if (this.props.stylist.stylists[stylistIndex][STYLIST_FIRST_NAME] !== '- Choose Employee -') {
+                stylists.push(this.props.stylist.stylists[stylistIndex])
+            }
+        }
+        return stylists
+    }
+
     render() {
         // console.log('props = ' + JSON.stringify(this.props))
         // console.log('state = ' + JSON.stringify(this.state))
@@ -251,6 +263,7 @@ class ModifyTreatmentScreen extends Component {
             }
         }
 
+        let stylists = this._filterListStylists()
         return (
             <View style={containerStyle}>
                 {
@@ -335,7 +348,7 @@ class ModifyTreatmentScreen extends Component {
                             null
                     }
                     <FlatList
-                        data={this.props.stylist.stylists}
+                        data={stylists}
                         extraData={this.state}
                         keyExtractor={(stylistItem, stylistIndex) => stylistIndex.toString()}
                         style={listStyle2}
