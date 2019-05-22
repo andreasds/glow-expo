@@ -33,3 +33,16 @@ export const insertSaleQuery = (sale) => {
         sale[SALE_AMOUNT] +
         ')'
 }
+
+export const selectAllActiveSaleUnPaidQuery = (sort, order) => {
+    let query = 'SELECT * FROM ' + SALES_SCHEMA +
+        ' WHERE ' +
+        SALE_ACTIVE + ' = \'Y\' AND ' +
+        SALE_TIME_PAID + ' IS NULL'
+    if (sort) {
+        query += ' ORDER BY ' + sort
+        if (order === 'desc') query += ' DESC'
+        else query += ' ASC'
+    }
+    return query
+}

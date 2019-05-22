@@ -5,7 +5,7 @@ import { FontAwesome } from '@expo/vector-icons'
 
 import { PARENT_PRODUCT_ID, CHILD_PRODUCT_ID } from '../../../constants/database/products'
 import { PRODUCT_ID, PRODUCT_NAME, PRODUCT_PACKAGE, PRODUCT_PRICE } from '../../../constants/database/productsDetails'
-import { SALE_AMOUNT, SALE_CUSTOMER_NAME, SALE_ID } from '../../../constants/database/sales'
+import { SALE_AMOUNT, SALE_CUSTOMER_NAME, SALE_ID, SALE_TIME_CREATED } from '../../../constants/database/sales'
 import { SALE_PRODUCT_ID } from '../../../constants/database/salesProducts'
 import { STYLIST_FIRST_NAME, STYLIST_ID, STYLIST_LAST_NAME } from '../../../constants/database/stylists'
 import { STYLISTS_SERVICES_PRICE } from '../../../constants/database/stylistsServices'
@@ -21,7 +21,7 @@ import { modifyButtonContainerStyle2, modifyButtonStyle } from '../../../constan
 import { numberInputStyle, textStyle, textInputStyle } from '../../../constants/styles/customer'
 import { titleTextStyle } from '../../../constants/styles/customer'
 
-import { insertSale } from '../../../redux/actions/database/SaleActions'
+import { insertSale, salesGot, selectAllActiveSaleUnPaid } from '../../../redux/actions/database/SaleActions'
 import { deleteSaleDetail, insertSaleDetail } from '../../../redux/actions/database/SaleDetailActions'
 import { deleteSaleProduct, insertSaleProduct } from '../../../redux/actions/database/SaleProductActions'
 
@@ -51,6 +51,7 @@ class ModifyCustomerScreen extends Component {
         }
 
         this._reinitializeModifyCustomer = this._reinitializeModifyCustomer.bind(this)
+        this._onCancelButtonPressed = this._onCancelButtonPressed.bind(this)
     }
 
     _reinitializeModifyCustomer(_result) {
@@ -83,8 +84,7 @@ class ModifyCustomerScreen extends Component {
                                 result: _result[key].result,
                                 loading: this.state.loading + 1
                             })
-                            // load customer
-                            // go back
+                            selectAllActiveSaleUnPaid(this.props.database.db, SALE_TIME_CREATED, 'asc', this._reinitializeModifyCustomer)
                         }
                     } else if (_result[key].result === 'error') {
                         this.setState({
@@ -143,6 +143,15 @@ class ModifyCustomerScreen extends Component {
                         })
                     }
                     this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'salesUnPaid': {
+                    let sales = _result[key]
+                    this.props.salesGot(sales._array, sales.length)
+                    this.setState({ loading: this.state.loading - 1 })
+
+                    const { goBack } = this.props.navigation
+                    goBack()
                     break
                 }
                 default: {
@@ -608,9 +617,7 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = dispatch => ({
-    databaseOpened: (db) => dispatch(databaseOpened(db)),
-    stylistsGot: (stylists, stylistsLen) => dispatch(stylistsGot(stylists, stylistsLen)),
-    productsGot: (products, productsLen) => dispatch(productsGot(products, productsLen))
+    salesGot: (sales, salesLen) => dispatch(salesGot(sales, salesLen))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ModifyCustomerScreen)

@@ -1,6 +1,7 @@
 import {
     createSaleTableQuery,
-    insertSaleQuery
+    insertSaleQuery,
+    selectAllActiveSaleUnPaidQuery
 } from '../../../constants/database/sales'
 import { UPDATE_SALE } from '../types'
 
@@ -37,6 +38,29 @@ export const insertSale = (db, sale, _callback) => {
                 },
                 (error) => {
                     _callback({ insertSale: { result: 'error', error } })
+                }
+            )
+        },
+        (error) => { },
+        (success) => { }
+    )
+}
+
+export const selectAllActiveSaleUnPaid = (db, sort, order, _callback) => {
+    db.transaction(
+        (tx) => {
+            tx.executeSql(selectAllActiveSaleUnPaidQuery(sort, order), [],
+                (_, success) => {
+                    // success = {"rowsAffected":0,"rows":{"_array":[{"stylist_id":2,"product_id":11,"price":50000},{"stylist_id":4,"product_id":11,"price":50000}],"length":2}}
+                    _callback({
+                        salesUnPaid: {
+                            _array: success.rows._array,
+                            length: success.rows.length
+                        }
+                    })
+                },
+                (error) => {
+                    _callback({ salesUnPaid: { result: 'error', error } })
                 }
             )
         },

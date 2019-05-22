@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 
 import { SQLite } from 'expo'
 import { DATABASE_NAME } from '../../constants/database/config'
+import { SALE_TIME_CREATED } from '../../constants/database/sales'
 import { STYLIST_FIRST_NAME, STYLIST_LAST_NAME } from '../../constants/database/stylists'
 import { PRODUCT_NAME } from '../../constants/database/productsDetails'
 
@@ -18,7 +19,7 @@ import { productsGot } from '../../redux/actions/database/ProductDetailActions'
 
 import { createProductTable } from '../../redux/actions/database/ProductActions'
 import { createProductDetailTable, selectAllActiveProduct } from '../../redux/actions/database/ProductDetailActions'
-import { createSaleTable } from '../../redux/actions/database/SaleActions'
+import { createSaleTable, salesGot, selectAllActiveSaleUnPaid } from '../../redux/actions/database/SaleActions'
 import { createSaleDetailTable } from '../../redux/actions/database/SaleDetailActions'
 import { createSaleProductTable } from '../../redux/actions/database/SaleProductActions'
 import { createStylistTable, getStylist, insertStylist, selectAllActiveStylist } from '../../redux/actions/database/StylistActions'
@@ -60,7 +61,7 @@ class HomeScreen extends Component {
                     } else if (lastVersion.version !== currentVersion) {
                         // TODO: database modification
                     } else {
-                        this.setState({ loading: this.state.loading + 2 })
+                        this.setState({ loading: this.state.loading + 3 })
 
                         let stylist = {}
                         stylist[STYLIST_FIRST_NAME] = '- Choose Employee -'
@@ -68,6 +69,7 @@ class HomeScreen extends Component {
                         getStylist(this.props.database.db, stylist, this._reinitializeHome)
 
                         selectAllActiveProduct(this.props.database.db, PRODUCT_NAME, 'asc', this._reinitializeHome)
+                        selectAllActiveSaleUnPaid(this.props.database.db, SALE_TIME_CREATED, 'asc', this._reinitializeHome)
                     }
                     this.setState({ loading: this.state.loading - 1 })
                     break
@@ -165,6 +167,12 @@ class HomeScreen extends Component {
                     this.setState({ loading: this.state.loading - 1 })
                     break
                 }
+                case 'salesUnPaid': {
+                    let sales = _result[key]
+                    this.props.salesGot(sales._array, sales.length)
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
                 case 'stylists': {
                     let stylists = _result[key]
                     this.props.stylistsGot(stylists._array, stylists.length)
@@ -217,6 +225,7 @@ class HomeScreen extends Component {
         if (!this.props.database.db ||
             this.state.loading ||
             !this.props.product.products ||
+            !this.props.sale.sales ||
             !this.props.stylist.stylists) {
             if (!this.props.database.db) {
                 return loadingScreen('Reading database', '')
@@ -225,6 +234,12 @@ class HomeScreen extends Component {
                     return loadingScreen('Reading treatments', '')
                 } else {
                     return loadingScreen('ERROR: Reading treatments', '')
+                }
+            } else if (!this.props.sale.sales) {
+                if (this.state.loading) {
+                    return loadingScreen('Reading customers', '')
+                } else {
+                    return loadingScreen('ERROR: Reading customers', '')
                 }
             } else if (!this.props.stylist.stylists) {
                 if (this.state.loading) {
@@ -271,18 +286,21 @@ class HomeScreen extends Component {
 const mapStateToProps = state => {
     const { db } = state.databaseReducers
     const { products, productsLen } = state.productReducers
+    const { sales, salesLen } = state.saleReducers
     const { stylists, stylistsLen } = state.stylistReducers
     return {
         database: { db },
         product: { products, productsLen },
+        sale: { sales, salesLen },
         stylist: { stylists, stylistsLen }
     }
 }
 
 const mapDispatchToProps = dispatch => ({
     databaseOpened: (db) => dispatch(databaseOpened(db)),
-    stylistsGot: (stylists, stylistsLen) => dispatch(stylistsGot(stylists, stylistsLen)),
-    productsGot: (products, productsLen) => dispatch(productsGot(products, productsLen))
+    productsGot: (products, productsLen) => dispatch(productsGot(products, productsLen)),
+    salesGot: (sales, salesLen) => dispatch(salesGot(sales, salesLen)),
+    stylistsGot: (stylists, stylistsLen) => dispatch(stylistsGot(stylists, stylistsLen))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)
