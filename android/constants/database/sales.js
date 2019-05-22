@@ -23,3 +23,13 @@ export const createSaleTableQuery = () => {
         SALE_ACTIVE + ' CHAR (1) NOT NULL DEFAULT (\'Y\')' +
         ')'
 }
+
+export const insertSaleQuery = (sale) => {
+    return 'INSERT INTO ' + SALES_SCHEMA + ' (' +
+        SALE_CUSTOMER_NAME + ', ' +
+        SALE_AMOUNT +
+        ') VALUES (' +
+        '\'' + sale[SALE_CUSTOMER_NAME] + '\', ' +
+        sale[SALE_AMOUNT] +
+        ')'
+}

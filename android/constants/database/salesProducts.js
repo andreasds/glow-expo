@@ -14,3 +14,20 @@ export const createSaleProductTableQuery = () => {
         SALE_PRODUCT_PRICE + ' INTEGER NOT NULL DEFAULT (0)' +
         ')'
 }
+
+export const insertSaleProductQuery = (saleProduct) => {
+    return 'INSERT INTO ' + SALES_PRODUCTS_SCHEMA + ' (' +
+        SALE_ID + ', ' +
+        PRODUCT_ID + ', ' +
+        SALE_PRODUCT_PRICE +
+        ') VALUES (' +
+        saleProduct[SALE_ID] + ', ' +
+        saleProduct[PRODUCT_ID] + ', ' +
+        saleProduct[SALE_PRODUCT_PRICE] +
+        ')'
+}
+
+export const deleteSaleProductQuery = (sale_id) => {
+    return 'DELETE FROM ' + SALES_PRODUCTS_SCHEMA +
+        ' WHERE ' + SALE_ID + ' = ' + sale_id
+}

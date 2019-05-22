@@ -5,7 +5,8 @@ import { FontAwesome } from '@expo/vector-icons'
 
 import { PARENT_PRODUCT_ID, CHILD_PRODUCT_ID } from '../../../constants/database/products'
 import { PRODUCT_ID, PRODUCT_NAME, PRODUCT_PACKAGE, PRODUCT_PRICE } from '../../../constants/database/productsDetails'
-import { SALE_AMOUNT, SALE_CUSTOMER_NAME } from '../../../constants/database/sales'
+import { SALE_AMOUNT, SALE_CUSTOMER_NAME, SALE_ID } from '../../../constants/database/sales'
+import { SALE_PRODUCT_ID } from '../../../constants/database/salesProducts'
 import { STYLIST_FIRST_NAME, STYLIST_ID, STYLIST_LAST_NAME } from '../../../constants/database/stylists'
 import { STYLISTS_SERVICES_PRICE } from '../../../constants/database/stylistsServices'
 
@@ -19,6 +20,10 @@ import { listContainer, listStyle2 } from '../../../constants/styles/customer'
 import { modifyButtonContainerStyle2, modifyButtonStyle } from '../../../constants/styles/customer'
 import { numberInputStyle, textStyle, textInputStyle } from '../../../constants/styles/customer'
 import { titleTextStyle } from '../../../constants/styles/customer'
+
+import { insertSale } from '../../../redux/actions/database/SaleActions'
+import { deleteSaleDetail, insertSaleDetail } from '../../../redux/actions/database/SaleDetailActions'
+import { deleteSaleProduct, insertSaleProduct } from '../../../redux/actions/database/SaleProductActions'
 
 class ModifyCustomerScreen extends Component {
     static navigationOptions = {
@@ -41,7 +46,110 @@ class ModifyCustomerScreen extends Component {
             stylistsServices,
             loading: 0,
             result: '',
-            error: ''
+            error: '',
+            insertSaleDetailCount: 0
+        }
+
+        this._reinitializeModifyCustomer = this._reinitializeModifyCustomer.bind(this)
+    }
+
+    _reinitializeModifyCustomer(_result) {
+        for (let key in _result) {
+            switch (key) {
+                case 'insertSale': {
+                    if (_result[key].result === 'success') {
+                        if (key === 'insertSale') {
+                            let customer = this.state.customer
+                            customer[SALE_ID] = _result[key].insertId
+                            this.setState({ customer })
+                        }
+
+                        this.setState({ loading: this.state.loading + 1 })
+                        deleteSaleDetail(this.props.database.db, this.state.customer[SALE_ID], this._reinitializeModifyCustomer)
+                    } else if (_result[key].result === 'error') {
+                        this.setState({
+                            loading: this.state.loading + 1,
+                            error: _result[key].error
+                        })
+                    }
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'insertSaleDetail': {
+                    this.setState({ insertSaleDetailCount: this.state.insertSaleDetailCount - 1 })
+                    if (_result[key].result === 'success') {
+                        if (this.state.insertSaleDetailCount === 0) {
+                            this.setState({
+                                result: _result[key].result,
+                                loading: this.state.loading + 1
+                            })
+                            // load customer
+                            // go back
+                        }
+                    } else if (_result[key].result === 'error') {
+                        this.setState({
+                            loading: this.state.loading + 1,
+                            error: _result[key].error
+                        })
+                    }
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'insertSaleProduct': {
+                    if (_result[key].result === 'success') {
+                        for (let packageIndex in _result[key].saleProduct.packages) {
+                            let saleDetail = _result[key].saleProduct.packages[packageIndex]
+                            saleDetail[SALE_PRODUCT_ID] = _result[key].insertId
+                            this.setState({
+                                loading: this.state.loading + 1,
+                                insertSaleDetailCount: this.state.insertSaleDetailCount + 1
+                            })
+                            insertSaleDetail(this.props.database.db, saleDetail, this._reinitializeModifyCustomer)
+                        }
+                    } else if (_result[key].result === 'error') {
+                        this.setState({
+                            loading: this.state.loading + 1,
+                            error: _result[key].error
+                        })
+                    }
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'deleteSaleDetail': {
+                    if (_result[key].result === 'success') {
+                        this.setState({ loading: this.state.loading + 1 })
+                        deleteSaleProduct(this.props.database.db, this.state.customer[SALE_ID], this._reinitializeModifyCustomer)
+                    } else if (_result[key].result === 'error') {
+                        this.setState({
+                            loading: this.state.loading + 1,
+                            error: _result[key].error
+                        })
+                    }
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'deleteSaleProduct': {
+                    if (_result[key].result === 'success') {
+                        for (let productIndex in this.state.customer.products) {
+                            let saleProduct = this.state.customer.products[productIndex]
+                            saleProduct[SALE_ID] = this.state.customer[SALE_ID]
+                            this.setState({ loading: this.state.loading + 1 })
+                            insertSaleProduct(this.props.database.db, saleProduct, this._reinitializeModifyCustomer)
+                        }
+                    } else if (_result[key].result === 'error') {
+                        this.setState({
+                            loading: this.state.loading + 1,
+                            error: _result[key].error
+                        })
+                    }
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                default: {
+                    console.log('Unprocessed _result[\'' + key + '\'] = ' + JSON.stringify(_result[key]))
+                    break
+                }
+            }
         }
     }
 
@@ -129,7 +237,6 @@ class ModifyCustomerScreen extends Component {
         let products = []
         let price = 0
         for (productIndex in customer.products) {
-            console.log('product = ' + JSON.stringify(customer.products[productIndex]))
             if (customer.products[productIndex][PRODUCT_ID] !== 0) {
                 products.push(customer.products[productIndex])
                 price += customer.products[productIndex][PRODUCT_PRICE]
@@ -141,7 +248,6 @@ class ModifyCustomerScreen extends Component {
     }
 
     _onSaveButtonPressed() {
-        console.log('customer = ' + JSON.stringify(this.state.customer))
         if (this.state.customer[SALE_CUSTOMER_NAME]) {
             this._getTotalPrice()
             let customer = this.state.customer
@@ -152,7 +258,7 @@ class ModifyCustomerScreen extends Component {
             })
 
             if (this.state.mode === 'add') {
-
+                insertSale(this.props.database.db, this.state.customer, this._reinitializeModifyCustomer)
             } else if (this.state.mode === 'edit') {
 
             }
@@ -236,6 +342,28 @@ class ModifyCustomerScreen extends Component {
     render() {
         // console.log('props = ' + JSON.stringify(this.props))
         // console.log('state = ' + JSON.stringify(this.state))
+
+        if (this.state.loading) {
+            if (this.state.result === '') {
+                if (this.state.mode === 'add') {
+                    return loadingScreen('Save new customer into database', '')
+                } else if (this.state.mode === 'edit') {
+                    return loadingScreen('Update customer into database', '')
+                } else {
+                    return loadingScreen('Unknown mode', '')
+                }
+            } else if (this.state.result === 'error') {
+                if (this.state.mode === 'add') {
+                    return loadingScreen('ERROR Save new customer into database', this.state.error)
+                } else if (this.state.mode === 'edit') {
+                    return loadingScreen('ERROR Update customer into database', this.state.error)
+                } else {
+                    return loadingScreen('Unknown mode', this.state.error)
+                }
+            } else {
+                return loadingScreen('Updating list customers', '')
+            }
+        }
 
         return (
             <View style={containerStyle}>
