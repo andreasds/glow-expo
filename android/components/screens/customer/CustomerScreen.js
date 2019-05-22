@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 
 import { loadingScreen } from '../../../constants/LoadingScreen'
 
+import { selectAllPackage } from '../../../redux/actions/database/ProductActions'
 import { salesGot } from '../../../redux/actions/database/SaleActions'
 import { selectAllStylistService } from '../../../redux/actions/database/StylistServiceActions'
 
@@ -35,6 +36,15 @@ class CustomerScreen extends Component {
             switch (key) {
                 case 'stylistsServices':
                     let stylistsServices = _result[key]._array
+                    this.setState({
+                        loading: this.state.loading + 1,
+                        stylistsServices
+                    })
+                    selectAllPackage(this.props.database.db, this._reinitializeCustomer)
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                case 'packages':
+                    let packages = _result[key]._array
                     this.setState({ loading: this.state.loading - 1 })
 
                     const { navigate } = this.props.navigation
@@ -44,7 +54,8 @@ class CustomerScreen extends Component {
                             this.setState({ process: '' })
                             navigate('AddCustomer', {
                                 mode: 'add',
-                                stylistsServices
+                                packages,
+                                stylistsServices: this.state.stylistsServices
                             })
                             break
                         // case 'info':

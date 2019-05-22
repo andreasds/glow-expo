@@ -41,7 +41,32 @@ export const containerStyle = {
 export const containerStyle2 = {
     ...containerStyle,
     backgroundColor: 'lightslategrey',
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
     padding: 0
+}
+
+export const containerStyle3 = {
+    ...containerStyle2,
+    flexDirection: 'column'
+}
+
+export const containerStyle4 = {
+    backgroundColor: 'white',
+    borderRadius: width * 0.01,
+    flex: 1,
+    flexDirection: 'column',
+    marginVertical: width * 0.01,
+    marginLeft: width * 0.05
+}
+
+export const containerStyle5 = {
+    backgroundColor: 'darkgrey',
+    borderRadius: width * 0.02,
+    flex: 1,
+    flexDirection: 'column',
+    margin: width * 0.003,
+    padding: width * 0.01
 }
 
 export const iconStyle = {
@@ -50,13 +75,12 @@ export const iconStyle = {
 }
 
 export const listContainer = {
-    alignItems: 'center',
     backgroundColor: 'lightslategrey',
     borderRadius: width * 0.02,
     flex: 1,
-    flexDirection: 'row',
-    minHeight: width * 0.15,
+    flexDirection: 'column',
     margin: width * 0.003,
+    minHeight: width * 0.15,
     padding: width * 0.02
 }
 
@@ -81,6 +105,7 @@ export const modifyButtonContainerStyle = {
 export const modifyButtonContainerStyle2 = {
     ...modifyButtonContainerStyle,
     flexDirection: 'column',
+    justifyContent: 'center',
     maxWidth: width * 0.11
 }
 
@@ -113,6 +138,13 @@ export const pickerContainer = {
     marginRight: width * 0.02,
     marginVertical: width * 0.01,
     paddingLeft: width * 0.02
+}
+
+export const pickerContainer2 = {
+    ...pickerContainer,
+    marginRight: 0,
+    marginVertical: 0,
+    paddingLeft: 0
 }
 
 export const scrollContainerStyle = {

@@ -155,10 +155,10 @@ class ModifyEmployeeScreen extends Component {
     }
 
     _onSaveButtonPressed() {
-        if (this.state.stylist.first_name) {
+        if (this.state.stylist[STYLIST_FIRST_NAME]) {
             let stylist = this.state.stylist
-            stylist.first_name = !stylist.first_name ? '' : stylist.first_name.trim()
-            stylist.last_name = !stylist.last_name ? '' : stylist.last_name.trim()
+            stylist[STYLIST_FIRST_NAME] = !stylist[STYLIST_FIRST_NAME] ? '' : stylist[STYLIST_FIRST_NAME].trim()
+            stylist[STYLIST_LAST_NAME] = !stylist[STYLIST_LAST_NAME] ? '' : stylist[STYLIST_LAST_NAME].trim()
             this.setState({
                 loading: this.state.loading + 1,
                 stylist
