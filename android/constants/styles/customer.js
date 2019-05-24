@@ -71,8 +71,7 @@ export const containerStyle5 = {
 
 export const containerStyle6 = {
     ...containerStyle4,
-    backgroundColor: 'lightslategrey',
-    height: width * 0.25
+    backgroundColor: 'lightslategrey'
 }
 
 export const iconStyle = {
@@ -112,7 +111,7 @@ export const listTextStyle = {
     color: 'white',
     flex: 1,
     fontSize: width * 0.06,
-    minHeight: width * 0.1,
+    minHeight: width * 0.09,
     marginHorizontal: width * 0.01,
     textAlignVertical: 'center'
 }
@@ -145,7 +144,6 @@ export const numberInputStyle = {
     borderRadius: width * 0.03,
     flex: 1,
     fontSize: width * 0.07,
-    height: width * 0.12,
     marginRight: width * 0.02,
     marginVertical: width * 0.01,
     padding: width * 0.02,
@@ -159,8 +157,7 @@ export const numberInputStyle2 = {
     borderRadius: width * 0.015,
     flex: 1,
     fontSize: width * 0.06,
-    height: width * 0.1,
-    maxWidth: width * 0.33,
+    maxWidth: width * 0.36,
     padding: width * 0.02,
     textAlign: 'right',
     textAlignVertical: 'center'
@@ -171,7 +168,6 @@ export const numberInputStyle3 = {
     borderRadius: width * 0.015,
     flex: 1,
     fontSize: width * 0.06,
-    height: width * 0.1,
     marginVertical: width * 0.005,
     padding: width * 0.02,
     textAlign: 'left',
@@ -212,7 +208,6 @@ export const textInputStyle = {
     backgroundColor: 'darkgrey',
     borderRadius: width * 0.015,
     fontSize: width * 0.06,
-    height: width * 0.1,
     padding: width * 0.02,
     textAlignVertical: 'center'
 }

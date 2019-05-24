@@ -66,7 +66,6 @@ class CustomerScreen extends Component {
                             if (process === 'add') {
                                 navigate('AddCustomer', {
                                     mode: 'add',
-                                    sale: this.state.sale,
                                     packages,
                                     stylistsServices: this.state.stylistsServices
                                 })

@@ -94,11 +94,10 @@ export const numberInputStyle = {
     backgroundColor: 'darkgrey',
     borderRadius: width * 0.015,
     fontSize: width * 0.06,
-    height: width * 0.1,
     padding: width * 0.02,
     textAlign: 'right',
     textAlignVertical: 'center',
-    width: width * 0.33
+    width: width * 0.36
 }
 
 export const scrollContainerStyle = {
@@ -119,7 +118,6 @@ export const textInputStyle = {
     backgroundColor: 'darkgrey',
     borderRadius: width * 0.015,
     fontSize: width * 0.06,
-    height: width * 0.1,
     padding: width * 0.02,
     textAlignVertical: 'center'
 }

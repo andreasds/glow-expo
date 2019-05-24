@@ -18,7 +18,7 @@ export const buttonStyle = {
 export const buttonTextStyle = {
     color: 'white',
     flex: 1,
-    fontSize: width * 0.06,
+    fontSize: width * 0.05,
     fontWeight: 'bold',
     textAlign: 'center',
     textAlignVertical: 'center'

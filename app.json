@@ -2,7 +2,7 @@
   "expo": {
     "name": "Glow",
     "slug": "glow-expo",
-    "privacy": "public",
+    "privacy": "unlisted",
     "sdkVersion": "32.0.0",
     "platforms": [
       "ios",
@@ -22,6 +22,9 @@
     "assetBundlePatterns": [
       "node_modules/@expo/vector-icons/fonts/FontAwesome.ttf"
     ],
+    "android": {
+      "package": "com.andreas.glow"
+    },
     "ios": {
       "supportsTablet": true
     }

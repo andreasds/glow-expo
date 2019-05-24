@@ -95,6 +95,10 @@ class HomeScreen extends Component {
                 }
                 case 'saleTable': {
                     console.log('Create sale table ' + JSON.stringify(_result[key].result))
+
+                    this.setState({ loading: this.state.loading + 1 })
+                    selectAllActiveSaleUnPaid(this.props.database.db, SALE_TIME_CREATED, 'asc', this._reinitializeHome)
+
                     this.setState({ loading: this.state.loading - 1 })
                     break
                 }
