@@ -1,13 +1,16 @@
 import React, { Component } from 'react'
-import { FlatList, ScrollView, Text, TouchableHighlight, View } from 'react-native'
+import { Alert, FlatList, ScrollView, Text, TouchableHighlight, View } from 'react-native'
 import { connect } from 'react-redux'
 
 import { PRODUCT_ID, PRODUCT_NAME, PRODUCT_PACKAGE } from '../../../constants/database/productsDetails'
-import { SALE_AMOUNT, SALE_CUSTOMER_NAME, SALE_TIME_CREATED } from '../../../constants/database/sales'
+import { CURRENT_TIMESTAMP, SALE_AMOUNT, SALE_AMOUNT_PAID, SALE_CUSTOMER_NAME, SALE_TIME_CREATED, SALE_TIME_PAID } from '../../../constants/database/sales'
 import { SALE_PRODUCT_PRICE } from '../../../constants/database/salesProducts'
 import { STYLIST_FIRST_NAME, STYLIST_ID, STYLIST_LAST_NAME } from '../../../constants/database/stylists'
 
+import { loadingScreen } from '../../../constants/LoadingScreen'
 import { intToNumberCurrencyString } from '../../../constants/utils/number'
+
+import { salesGot, selectAllActiveSaleUnPaid, updateSale } from '../../../redux/actions/database/SaleActions'
 
 import { buttonContainerStyle, buttonStyle, buttonTextStyle, highlightButtonColor } from '../../../constants/styles/customer'
 import { containerStyle, containerStyle2, containerStyle3, containerStyle6, scrollContainerStyle } from '../../../constants/styles/customer'
@@ -24,18 +27,54 @@ class InfoCustomerScreen extends Component {
         super(props)
 
         const { navigation } = this.props
-        let mode = navigation.getParam('mode', '')
         let sale = navigation.getParam('sale', {})
         let packages = navigation.getParam('packages', {})
         let stylistsServices = navigation.getParam('stylistsServices', {})
         this.state = {
-            mode,
             sale,
             packages,
             stylistsServices,
             loading: 0,
+            process: '',
             result: '',
             error: ''
+        }
+
+        this._reinitializeInfoCustomer = this._reinitializeInfoCustomer.bind(this)
+    }
+
+    _reinitializeInfoCustomer(_result) {
+        for (let key in _result) {
+            switch (key) {
+                case 'updateSale': {
+                    if (_result[key].result === 'error') {
+                        console.log('ERROR Update sale = ' + JSON.stringify(_result[key].error))
+                    }
+
+                    this.setState({ loading: this.state.loading + 1 })
+                    selectAllActiveSaleUnPaid(this.props.database.db, SALE_TIME_CREATED, 'asc', this._reinitializeInfoCustomer)
+
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'salesUnPaid': {
+                    let sales = _result[key]
+                    this.props.salesGot(sales._array, sales.length)
+
+                    this.setState({
+                        loading: this.state.loading + 1,
+                        process: 'print'
+                    })
+                    this._onPrintRoutine()
+
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                default: {
+                    console.log('Unprocessed _result[\'' + key + '\'] = ' + JSON.stringify(_result[key]))
+                    break
+                }
+            }
         }
     }
 
@@ -53,12 +92,91 @@ class InfoCustomerScreen extends Component {
     }
 
     _onBackButtonPressed() {
-        const { goBack } = this.props.navigation
-        goBack()
+        if (this.state.sale[SALE_TIME_PAID] === null) {
+            const { goBack } = this.props.navigation
+            goBack()
+        } else {
+            Alert.alert(
+                '',
+                'Are you done with customer ' + this.state.sale[SALE_CUSTOMER_NAME] + '?',
+                [
+                    {
+                        text: 'OK', onPress: () => {
+                            const { goBack } = this.props.navigation
+                            goBack()
+                        }
+                    },
+                    { text: 'Cancel', style: 'cancel' }
+                ],
+                { cancelable: true }
+            )
+        }
+    }
+
+    _onPrintRoutine() {
+        console.log('PRINT!')
+        this.setState({
+            loading: this.state.loading - 1,
+            process: ''
+        })
+    }
+
+    _checkSale() {
+        let default_stylist_id = this._getDefaultStylistId()
+        let sale = this.state.sale
+        if (sale.products.length === 0) return false
+        for (productIndex in sale.products) {
+            if (sale.products[productIndex][PRODUCT_ID] === 0) return false
+            for (detailIndex in sale.products[productIndex].packages) {
+                if (sale.products[productIndex].packages[detailIndex][PRODUCT_ID] === 0 ||
+                    sale.products[productIndex].packages[detailIndex][STYLIST_ID] === default_stylist_id) {
+                    return false
+                }
+            }
+        }
+        return true
     }
 
     _onPrintButtonPressed() {
-
+        if (this._checkSale()) {
+            Alert.alert(
+                '',
+                'Are you sure you want to print ' + this.state.sale[SALE_CUSTOMER_NAME] + '?',
+                [
+                    {
+                        text: 'OK', onPress: () => {
+                            this.setState({ loading: this.state.loading + 1 })
+                            let sale = this.state.sale
+                            if (sale[SALE_TIME_PAID] === null) {
+                                sale[SALE_TIME_PAID] = CURRENT_TIMESTAMP
+                                sale[SALE_AMOUNT_PAID] = sale[SALE_AMOUNT]
+                                this.setState({
+                                    sale,
+                                    process: 'update'
+                                })
+                                updateSale(this.props.database.db, sale, this._reinitializeInfoCustomer)
+                            } else {
+                                this.setState({ process: 'print' })
+                                this._onPrintRoutine()
+                            }
+                        }
+                    },
+                    { text: 'Cancel', style: 'cancel' }
+                ],
+                { cancelable: true }
+            )
+        } else {
+            Alert.alert(
+                '',
+                'Check treatment list and employee list!',
+                [
+                    {
+                        text: 'OK', onPress: () => { }
+                    }
+                ],
+                { cancelable: true }
+            )
+        }
     }
 
     _getProductName(product_id) {
@@ -81,7 +199,42 @@ class InfoCustomerScreen extends Component {
         return 'UNKNOWN'
     }
 
+    _getDefaultStylistId() {
+        for (stylistIndex in this.props.stylist.stylists) {
+            if (this.props.stylist.stylists[stylistIndex][STYLIST_FIRST_NAME] === '- Choose Employee -') {
+                return (this.props.stylist.stylists[stylistIndex][STYLIST_ID])
+            }
+        }
+        return 0
+    }
+
     render() {
+        // console.log('props = ' + JSON.stringify(this.props))
+        // console.log('state = ' + JSON.stringify(this.state))
+
+        if (this.state.loading) {
+            switch (this.state.process) {
+                case 'update':
+                    if (this.state.result === '') {
+                        return loadingScreen('Update customer ' + this.state.sale[SALE_CUSTOMER_NAME] + ' into database', '')
+                    } else if (this.state.result === 'error') {
+                        return loadingScreen('ERROR Update customer ' + this.state.sale[SALE_CUSTOMER_NAME] + ' into database', this.state.error)
+                    } else {
+                        return loadingScreen('ERROR Update customer ' + this.state.sale[SALE_CUSTOMER_NAME] + ' into database', 'Unknown process in ' + this.state.process + ' data')
+                    }
+                case 'print':
+                    if (this.state.result === '') {
+                        return loadingScreen('Print customer ' + this.state.sale[SALE_CUSTOMER_NAME], '')
+                    } else if (this.state.result === 'error') {
+                        return loadingScreen('ERROR Print customer ' + this.state.sale[SALE_CUSTOMER_NAME], this.state.error)
+                    } else {
+                        return loadingScreen('ERROR Print customer ' + this.state.sale[SALE_CUSTOMER_NAME], 'Unknown process in print data')
+                    }
+                default:
+                    return loadingScreen('ERROR ' + this.state.process + ': customer ' + this.state.sale[SALE_CUSTOMER_NAME], this.state.error)
+            }
+        }
+
         return (
             <View style={containerStyle}>
                 <Text style={titleTextStyle}>CUSTOMER INFO</Text>
@@ -137,20 +290,24 @@ class InfoCustomerScreen extends Component {
                             <Text style={buttonTextStyle}>PRINT</Text>
                         </View>
                     </TouchableHighlight>
-                    <TouchableHighlight
-                        onPress={() => this._onEditButtonPressed()}
-                        style={buttonStyle}
-                        underlayColor={highlightButtonColor}>
-                        <View>
-                            <Text style={buttonTextStyle}>EDIT</Text>
-                        </View>
-                    </TouchableHighlight>
+                    {
+                        this.state.sale[SALE_TIME_PAID] === null ?
+                            <TouchableHighlight
+                                onPress={() => this._onEditButtonPressed()}
+                                style={buttonStyle}
+                                underlayColor={highlightButtonColor}>
+                                <View>
+                                    <Text style={buttonTextStyle}>EDIT</Text>
+                                </View>
+                            </TouchableHighlight> :
+                            null
+                    }
                     <TouchableHighlight
                         onPress={() => this._onBackButtonPressed()}
                         style={buttonStyle}
                         underlayColor={highlightButtonColor}>
                         <View>
-                            <Text style={buttonTextStyle}>BACK</Text>
+                            <Text style={buttonTextStyle}>{this.state.sale[SALE_TIME_PAID] === null ? 'BACK' : 'DONE'}</Text>
                         </View>
                     </TouchableHighlight>
                 </View>
@@ -170,6 +327,8 @@ const mapStateToProps = state => {
     }
 }
 
-const mapDispatchToProps = dispatch => ({})
+const mapDispatchToProps = dispatch => ({
+    salesGot: (sales, salesLen) => dispatch(salesGot(sales, salesLen))
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(InfoCustomerScreen)

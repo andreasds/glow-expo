@@ -10,11 +10,13 @@ export const SALE_DISCOUNT_AMOUNT = 'discount_amount'
 export const SALE_AMOUNT_PAID = 'sale_amount_paid'
 export const SALE_ACTIVE = 'active'
 
+export const CURRENT_TIMESTAMP = 'CURRENT_TIMESTAMP'
+
 export const createSaleTableQuery = () => {
     return 'CREATE TABLE IF NOT EXISTS ' + SALES_SCHEMA + ' (' +
         SALE_ID + ' INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, ' +
         SALE_CUSTOMER_NAME + ' VARCHAR (50) NOT NULL DEFAULT (\'\'), ' +
-        SALE_TIME_CREATED + ' DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP), ' +
+        SALE_TIME_CREATED + ' DATETIME NOT NULL DEFAULT (' + CURRENT_TIMESTAMP + '), ' +
         SALE_TIME_PAID + ' DATETIME DEFAULT NULL, ' +
         SALE_AMOUNT + ' INTEGER NOT NULL DEFAULT (0), ' +
         SALE_TAX_AMOUNT + ' INTEGER NOT NULL DEFAULT (0), ' +
