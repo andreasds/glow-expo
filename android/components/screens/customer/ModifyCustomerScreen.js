@@ -522,7 +522,7 @@ class ModifyCustomerScreen extends Component {
                                 </View>
                                 {
                                     this.state.sale.products[index][PRODUCT_PACKAGE] === 'Y' ?
-                                        < View style={containerStyle4}>
+                                        <View style={containerStyle4}>
                                             {
                                                 item.packages.map((packageItem, packageIndex) => {
                                                     return (

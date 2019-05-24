@@ -69,6 +69,12 @@ export const containerStyle5 = {
     padding: width * 0.01
 }
 
+export const containerStyle6 = {
+    ...containerStyle4,
+    backgroundColor: 'lightslategrey',
+    height: width * 0.25
+}
+
 export const iconStyle = {
     textAlign: 'center',
     textAlignVertical: 'center'
@@ -144,6 +150,31 @@ export const numberInputStyle = {
     marginVertical: width * 0.01,
     padding: width * 0.02,
     textAlign: 'right',
+    textAlignVertical: 'center'
+}
+
+export const numberInputStyle2 = {
+    alignSelf: 'center',
+    backgroundColor: 'darkgrey',
+    borderRadius: width * 0.015,
+    flex: 1,
+    fontSize: width * 0.06,
+    height: width * 0.1,
+    maxWidth: width * 0.33,
+    padding: width * 0.02,
+    textAlign: 'right',
+    textAlignVertical: 'center'
+}
+
+export const numberInputStyle3 = {
+    backgroundColor: 'lightgrey',
+    borderRadius: width * 0.015,
+    flex: 1,
+    fontSize: width * 0.06,
+    height: width * 0.1,
+    marginVertical: width * 0.005,
+    padding: width * 0.02,
+    textAlign: 'left',
     textAlignVertical: 'center'
 }
 
