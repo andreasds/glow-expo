@@ -56,10 +56,21 @@ class InfoTreatmentScreen extends Component {
         return product_name
     }
 
+    _filterListStylists() {
+        let stylists = []
+        for (stylistIndex in this.props.stylist.stylists) {
+            if (this.props.stylist.stylists[stylistIndex][STYLIST_FIRST_NAME] !== '- Choose Employee -') {
+                stylists.push(this.props.stylist.stylists[stylistIndex])
+            }
+        }
+        return stylists
+    }
+
     render() {
         // console.log('props = ' + JSON.stringify(this.props))
         // console.log('state = ' + JSON.stringify(this.state))
 
+        let stylists = this._filterListStylists()
         return (
             <View style={containerStyle}>
                 <Text style={titleTextStyle}>TREATMENT INFO</Text>
@@ -80,7 +91,7 @@ class InfoTreatmentScreen extends Component {
                     }
                     <Text style={textStyle}>{'Rp ' + intToNumberCurrencyString(this.state.product[PRODUCT_PRICE]) + ',00'}</Text>
                     <FlatList
-                        data={this.props.stylist.stylists}
+                        data={stylists}
                         extraData={this.state}
                         keyExtractor={(stylistItem, stylistIndex) => stylistIndex.toString()}
                         style={listStyle}
