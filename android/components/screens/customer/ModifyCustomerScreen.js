@@ -16,12 +16,12 @@ import { intToNumberCurrencyString, numberCurrencyStringToInt } from '../../../c
 import { buttonContainerStyle, buttonStyle, buttonTextStyle, highlightButtonColor } from '../../../constants/styles/customer'
 import { containerStyle, containerStyle2, containerStyle3, containerStyle4, containerStyle5, pickerContainer, scrollContainerStyle } from '../../../constants/styles/customer'
 import { iconStyle } from '../../../constants/styles/customer'
-import { listContainer, listStyle2 } from '../../../constants/styles/customer'
+import { listContainer2, listStyle2 } from '../../../constants/styles/customer'
 import { modifyButtonContainerStyle2, modifyButtonStyle } from '../../../constants/styles/customer'
 import { numberInputStyle, textStyle, textInputStyle } from '../../../constants/styles/customer'
 import { titleTextStyle } from '../../../constants/styles/customer'
 
-import { insertSale, salesGot, selectAllActiveSaleUnPaid } from '../../../redux/actions/database/SaleActions'
+import { insertSale, salesGot, selectAllActiveSaleUnPaid, updateSale } from '../../../redux/actions/database/SaleActions'
 import { deleteSaleDetail, insertSaleDetail } from '../../../redux/actions/database/SaleDetailActions'
 import { deleteSaleProduct, insertSaleProduct } from '../../../redux/actions/database/SaleProductActions'
 
@@ -35,13 +35,13 @@ class ModifyCustomerScreen extends Component {
 
         const { navigation } = this.props
         let mode = navigation.getParam('mode', '')
-        let customer = navigation.getParam('customer', {})
-        if (!customer.products) { customer.products = [] }
+        let sale = navigation.getParam('sale', {})
+        if (!sale.products) { sale.products = [] }
         let packages = navigation.getParam('packages', {})
         let stylistsServices = navigation.getParam('stylistsServices', {})
         this.state = {
             mode,
-            customer,
+            sale,
             packages,
             stylistsServices,
             loading: 0,
@@ -57,16 +57,17 @@ class ModifyCustomerScreen extends Component {
     _reinitializeModifyCustomer(_result) {
         for (let key in _result) {
             switch (key) {
-                case 'insertSale': {
+                case 'insertSale':
+                case 'updateSale': {
                     if (_result[key].result === 'success') {
                         if (key === 'insertSale') {
-                            let customer = this.state.customer
-                            customer[SALE_ID] = _result[key].insertId
-                            this.setState({ customer })
+                            let sale = this.state.sale
+                            sale[SALE_ID] = _result[key].insertId
+                            this.setState({ sale })
                         }
 
                         this.setState({ loading: this.state.loading + 1 })
-                        deleteSaleDetail(this.props.database.db, this.state.customer[SALE_ID], this._reinitializeModifyCustomer)
+                        deleteSaleDetail(this.props.database.db, this.state.sale[SALE_ID], this._reinitializeModifyCustomer)
                     } else if (_result[key].result === 'error') {
                         this.setState({
                             loading: this.state.loading + 1,
@@ -118,7 +119,7 @@ class ModifyCustomerScreen extends Component {
                 case 'deleteSaleDetail': {
                     if (_result[key].result === 'success') {
                         this.setState({ loading: this.state.loading + 1 })
-                        deleteSaleProduct(this.props.database.db, this.state.customer[SALE_ID], this._reinitializeModifyCustomer)
+                        deleteSaleProduct(this.props.database.db, this.state.sale[SALE_ID], this._reinitializeModifyCustomer)
                     } else if (_result[key].result === 'error') {
                         this.setState({
                             loading: this.state.loading + 1,
@@ -130,11 +131,19 @@ class ModifyCustomerScreen extends Component {
                 }
                 case 'deleteSaleProduct': {
                     if (_result[key].result === 'success') {
-                        for (let productIndex in this.state.customer.products) {
-                            let saleProduct = this.state.customer.products[productIndex]
-                            saleProduct[SALE_ID] = this.state.customer[SALE_ID]
-                            this.setState({ loading: this.state.loading + 1 })
-                            insertSaleProduct(this.props.database.db, saleProduct, this._reinitializeModifyCustomer)
+                        if (this.state.sale.products.length) {
+                            for (let productIndex in this.state.sale.products) {
+                                let saleProduct = this.state.sale.products[productIndex]
+                                saleProduct[SALE_ID] = this.state.sale[SALE_ID]
+                                this.setState({ loading: this.state.loading + 1 })
+                                insertSaleProduct(this.props.database.db, saleProduct, this._reinitializeModifyCustomer)
+                            }
+                        } else {
+                            this.setState({
+                                result: _result[key].result,
+                                loading: this.state.loading + 1
+                            })
+                            selectAllActiveSaleUnPaid(this.props.database.db, SALE_TIME_CREATED, 'asc', this._reinitializeModifyCustomer)
                         }
                     } else if (_result[key].result === 'error') {
                         this.setState({
@@ -182,35 +191,35 @@ class ModifyCustomerScreen extends Component {
     }
 
     _onAddTreatmentButtonPressed() {
-        let customer = this.state.customer
-        let products = customer.products
+        let sale = this.state.sale
+        let products = sale.products
 
         let saleProduct = {}
         saleProduct[PRODUCT_ID] = 0
         saleProduct.packages = this._getEmptyPackages([{ 'child_product_id': 0 }])
 
         products.push(saleProduct)
-        customer.products = products
-        this.setState({ customer })
+        sale.products = products
+        this.setState({ sale })
     }
 
     _onRemoveTreatmentPressed(productIndex) {
-        let productName = this._getProductName(this.state.customer.products[productIndex][PRODUCT_ID])
+        let productName = this._getProductName(this.state.sale.products[productIndex][PRODUCT_ID])
         Alert.alert(
             '',
             'Are you sure you want to delete ' + (productName === 'UNKNOWN' ? 'this product' : productName) + '?',
             [
                 {
                     text: 'OK', onPress: () => {
-                        let customer = this.state.customer
+                        let sale = this.state.sale
                         let products = []
-                        for (productIdx in customer.products) {
+                        for (productIdx in sale.products) {
                             if (productIdx !== productIndex.toString()) {
-                                products.push(customer.products[productIdx])
+                                products.push(sale.products[productIdx])
                             }
                         }
-                        customer.products = products
-                        this.setState({ customer })
+                        sale.products = products
+                        this.setState({ sale })
                     }
                 },
                 { text: 'Cancel', style: 'cancel' }
@@ -222,17 +231,17 @@ class ModifyCustomerScreen extends Component {
     _onResetStylistServicePricePressed(productIndex) {
         Alert.alert(
             '',
-            'Are you sure you want to reset price of ' + this._getProductName(this.state.customer.products[productIndex][PRODUCT_ID]) + '?',
+            'Are you sure you want to reset price of ' + this._getProductName(this.state.sale.products[productIndex][PRODUCT_ID]) + '?',
             [
                 {
                     text: 'OK', onPress: () => {
-                        let customer = this.state.customer
-                        if (customer.products[productIndex][PRODUCT_PACKAGE] === 'Y') {
-                            customer.products[productIndex][PRODUCT_PRICE] = this._getProductPrice(customer.products[productIndex][PRODUCT_ID])
+                        let sale = this.state.sale
+                        if (sale.products[productIndex][PRODUCT_PACKAGE] === 'Y') {
+                            sale.products[productIndex][PRODUCT_PRICE] = this._getProductPrice(sale.products[productIndex][PRODUCT_ID])
                         } else {
-                            customer.products[productIndex][PRODUCT_PRICE] = this._getStylistServicePrice(customer.products[productIndex].packages[0][STYLIST_ID], customer.products[productIndex].packages[0][PRODUCT_ID])
+                            sale.products[productIndex][PRODUCT_PRICE] = this._getStylistServicePrice(sale.products[productIndex].packages[0][STYLIST_ID], sale.products[productIndex].packages[0][PRODUCT_ID])
                         }
-                        this.setState({ customer })
+                        this.setState({ sale })
                     }
                 },
                 { text: 'Cancel', style: 'cancel' }
@@ -242,34 +251,34 @@ class ModifyCustomerScreen extends Component {
     }
 
     _getTotalPrice() {
-        let customer = this.state.customer
+        let sale = this.state.sale
         let products = []
         let price = 0
-        for (productIndex in customer.products) {
-            if (customer.products[productIndex][PRODUCT_ID] !== 0) {
-                products.push(customer.products[productIndex])
-                price += customer.products[productIndex][PRODUCT_PRICE]
+        for (productIndex in sale.products) {
+            if (sale.products[productIndex][PRODUCT_ID] !== 0) {
+                products.push(sale.products[productIndex])
+                price += sale.products[productIndex][PRODUCT_PRICE]
             }
         }
-        customer.products = products
-        customer[SALE_AMOUNT] = price
-        this.setState({ customer })
+        sale.products = products
+        sale[SALE_AMOUNT] = price
+        this.setState({ sale })
     }
 
     _onSaveButtonPressed() {
-        if (this.state.customer[SALE_CUSTOMER_NAME]) {
+        if (this.state.sale[SALE_CUSTOMER_NAME]) {
             this._getTotalPrice()
-            let customer = this.state.customer
-            customer[SALE_CUSTOMER_NAME] = !customer[SALE_CUSTOMER_NAME] ? '' : customer[SALE_CUSTOMER_NAME].trim()
+            let sale = this.state.sale
+            sale[SALE_CUSTOMER_NAME] = !sale[SALE_CUSTOMER_NAME] ? '' : sale[SALE_CUSTOMER_NAME].trim()
             this.setState({
                 loading: this.state.loading + 1,
-                customer
+                sale
             })
 
             if (this.state.mode === 'add') {
-                insertSale(this.props.database.db, this.state.customer, this._reinitializeModifyCustomer)
+                insertSale(this.props.database.db, this.state.sale, this._reinitializeModifyCustomer)
             } else if (this.state.mode === 'edit') {
-
+                updateSale(this.props.database.db, this.state.sale, this._reinitializeModifyCustomer)
             }
         } else {
             Alert.alert(
@@ -388,30 +397,30 @@ class ModifyCustomerScreen extends Component {
                     <TextInput
                         maxLength={50}
                         onChangeText={(text) => {
-                            let customer = this.state.customer
-                            customer[SALE_CUSTOMER_NAME] = text
-                            this.setState({ customer })
+                            let sale = this.state.sale
+                            sale[SALE_CUSTOMER_NAME] = text
+                            this.setState({ sale })
                         }}
                         selectTextOnFocus={true}
                         style={textInputStyle}
                         placeholder='Customer Name'
-                        value={this.state.customer[SALE_CUSTOMER_NAME]} />
+                        value={this.state.sale[SALE_CUSTOMER_NAME]} />
                     <Text style={textStyle}>Treatment</Text>
                     <FlatList
-                        data={this.state.customer.products}
+                        data={this.state.sale.products}
                         extraData={this.state}
                         keyExtractor={(productItem, productIndex) => productIndex.toString()}
                         style={listStyle2}
                         renderItem={({ item, index }) => (
-                            <View style={listContainer}>
+                            <View style={listContainer2}>
                                 <View style={containerStyle2}>
                                     <View style={containerStyle3}>
                                         <View style={pickerContainer}>
                                             <Picker
                                                 mode='dropdown'
                                                 onValueChange={(productId, productIndex) => {
-                                                    let customer = this.state.customer
-                                                    let products = customer.products
+                                                    let sale = this.state.sale
+                                                    let products = sale.products
                                                     products[index][PRODUCT_ID] = productId
                                                     products[index][PRODUCT_PACKAGE] = productId === 0 ? '' : this.props.product.products[productIndex - 1][PRODUCT_PACKAGE]
                                                     if (products[index][PRODUCT_PACKAGE] === 'Y') {
@@ -422,8 +431,8 @@ class ModifyCustomerScreen extends Component {
                                                         products[index][PRODUCT_PRICE] = 0
                                                         products[index].packages = this._getEmptyPackages([{ 'child_product_id': productId }])
                                                     }
-                                                    customer.products = products
-                                                    this.setState({ customer })
+                                                    sale.products = products
+                                                    this.setState({ sale })
                                                 }}
                                                 selectedValue={item[PRODUCT_ID]}>
                                                 <Picker.Item label={'- Choose Treatment -'} value={0} />
@@ -441,19 +450,19 @@ class ModifyCustomerScreen extends Component {
                                             </Picker>
                                         </View>
                                         {
-                                            this.state.customer.products[index][PRODUCT_PACKAGE] === 'N' ?
+                                            this.state.sale.products[index][PRODUCT_PACKAGE] === 'N' ?
                                                 <View style={pickerContainer}>
                                                     <Picker
                                                         mode='dropdown'
                                                         onValueChange={(stylistId, stylistIndex) => {
-                                                            let customer = this.state.customer
-                                                            let products = customer.products
+                                                            let sale = this.state.sale
+                                                            let products = sale.products
                                                             let packages = products[index].packages
                                                             packages[0][STYLIST_ID] = stylistId
                                                             products[index].packages = packages
                                                             products[index][PRODUCT_PRICE] = this._getStylistServicePrice(stylistId, products[index][PRODUCT_ID])
-                                                            customer.products = products
-                                                            this.setState({ customer })
+                                                            sale.products = products
+                                                            this.setState({ sale })
                                                         }}
                                                         selectedValue={item.packages[0][STYLIST_ID]}>
                                                         {
@@ -472,22 +481,22 @@ class ModifyCustomerScreen extends Component {
                                                 null
                                         }
                                         {
-                                            this.state.customer.products[index][PRODUCT_PACKAGE] === 'Y' ||
-                                                this.state.customer.products[index][PRODUCT_PACKAGE] === 'N' ?
+                                            this.state.sale.products[index][PRODUCT_PACKAGE] === 'Y' ||
+                                                this.state.sale.products[index][PRODUCT_PACKAGE] === 'N' ?
                                                 <TextInput
                                                     keyboardType='numeric'
                                                     maxLength={11}
                                                     onChangeText={(text) => {
-                                                        let customer = this.state.customer
-                                                        let products = customer.products
+                                                        let sale = this.state.sale
+                                                        let products = sale.products
                                                         products[index][PRODUCT_PRICE] = numberCurrencyStringToInt(text)
-                                                        customer.products = products
-                                                        this.setState({ customer })
+                                                        sale.products = products
+                                                        this.setState({ sale })
                                                     }}
                                                     selectTextOnFocus={true}
                                                     style={numberInputStyle}
                                                     placeholder='Price'
-                                                    value={intToNumberCurrencyString(this.state.customer.products[index][PRODUCT_PRICE], 0)} /> :
+                                                    value={intToNumberCurrencyString(this.state.sale.products[index][PRODUCT_PRICE], 0)} /> :
                                                 null
                                         }
                                     </View>
@@ -499,8 +508,8 @@ class ModifyCustomerScreen extends Component {
                                             <FontAwesome color='white' name='remove' size={32} style={iconStyle} />
                                         </TouchableHighlight>
                                         {
-                                            this.state.customer.products[index][PRODUCT_PACKAGE] === 'Y' ||
-                                                this.state.customer.products[index][PRODUCT_PACKAGE] === 'N' ?
+                                            this.state.sale.products[index][PRODUCT_PACKAGE] === 'Y' ||
+                                                this.state.sale.products[index][PRODUCT_PACKAGE] === 'N' ?
                                                 <TouchableHighlight
                                                     onPress={() => this._onResetStylistServicePricePressed(index)}
                                                     style={modifyButtonStyle}
@@ -512,7 +521,7 @@ class ModifyCustomerScreen extends Component {
                                     </View>
                                 </View>
                                 {
-                                    this.state.customer.products[index][PRODUCT_PACKAGE] === 'Y' ?
+                                    this.state.sale.products[index][PRODUCT_PACKAGE] === 'Y' ?
                                         < View style={containerStyle4}>
                                             {
                                                 item.packages.map((packageItem, packageIndex) => {
@@ -543,11 +552,11 @@ class ModifyCustomerScreen extends Component {
                                                                 <Picker
                                                                     mode='dropdown'
                                                                     onValueChange={(stylisyId, stylistIndex) => {
-                                                                        let customer = this.state.customer
-                                                                        let packages = customer.products[index].packages
+                                                                        let sale = this.state.sale
+                                                                        let packages = sale.products[index].packages
                                                                         packages[packageIndex][STYLIST_ID] = stylisyId
-                                                                        customer.products[index].packages = packages
-                                                                        this.setState({ customer })
+                                                                        sale.products[index].packages = packages
+                                                                        this.setState({ sale })
                                                                     }}
                                                                     selectedValue={item.packages[packageIndex][STYLIST_ID]}>
                                                                     {

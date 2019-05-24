@@ -1,7 +1,8 @@
 import {
     createSaleProductTableQuery,
     deleteSaleProductQuery,
-    insertSaleProductQuery
+    insertSaleProductQuery,
+    selectAllSaleProductBySaleQuery
 } from '../../../constants/database/salesProducts'
 
 export const createSaleProductTable = (db, _callback) => {
@@ -56,6 +57,29 @@ export const deleteSaleProduct = (db, sale_id, _callback) => {
                 },
                 (error) => {
                     _callback({ deleteSaleProduct: { result: 'error', error } })
+                }
+            )
+        },
+        (error) => { },
+        (success) => { }
+    )
+}
+
+export const selectAllSaleProductBySale = (db, sale_id, _callback) => {
+    db.transaction(
+        (tx) => {
+            tx.executeSql(selectAllSaleProductBySaleQuery(sale_id), [],
+                (_, success) => {
+                    // success = {"rowsAffected":0,"rows":{"_array":[{"stylist_id":2,"sale_id":11,"price":50000},{"stylist_id":4,"sale_id":11,"price":50000}],"length":2}}
+                    _callback({
+                        saleProductBySale: {
+                            _array: success.rows._array,
+                            length: success.rows.length
+                        }
+                    })
+                },
+                (error) => {
+                    _callback({ saleProductBySale: { result: 'error', error } })
                 }
             )
         },

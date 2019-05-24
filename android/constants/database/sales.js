@@ -34,6 +34,29 @@ export const insertSaleQuery = (sale) => {
         ')'
 }
 
+export const updateSaleQuery = (sale) => {
+    return 'UPDATE ' + SALES_SCHEMA +
+        ' SET ' +
+        SALE_CUSTOMER_NAME + ' = \'' + sale[SALE_CUSTOMER_NAME] + '\', ' +
+        SALE_TIME_CREATED + ' = \'' + sale[SALE_TIME_CREATED] + '\', ' +
+        SALE_TIME_PAID + ' = ' + sale[SALE_TIME_PAID] + ', ' +
+        SALE_AMOUNT + ' = ' + sale[SALE_AMOUNT] + ', ' +
+        SALE_TAX_AMOUNT + ' = ' + sale[SALE_TAX_AMOUNT] + ', ' +
+        SALE_DISCOUNT_AMOUNT + ' = ' + sale[SALE_DISCOUNT_AMOUNT] + ', ' +
+        SALE_AMOUNT_PAID + ' = ' + sale[SALE_AMOUNT_PAID] + ', ' +
+        SALE_ACTIVE + ' = \'' + sale[SALE_ACTIVE] + '\' ' +
+        ' WHERE ' +
+        SALE_ID + ' = ' + sale[SALE_ID]
+}
+
+export const deleteSaleQuery = (sale) => {
+    return 'UPDATE ' + SALES_SCHEMA +
+        ' SET ' +
+        SALE_ACTIVE + ' = \'N\'' +
+        ' WHERE ' +
+        SALE_ID + ' = ' + sale[SALE_ID]
+}
+
 export const selectAllActiveSaleUnPaidQuery = (sort, order) => {
     let query = 'SELECT * FROM ' + SALES_SCHEMA +
         ' WHERE ' +

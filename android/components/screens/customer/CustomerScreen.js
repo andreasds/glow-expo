@@ -1,16 +1,25 @@
 import React, { Component } from 'react'
-import { FlatList, Text, TouchableHighlight, View } from 'react-native'
+import { Alert, FlatList, Text, TouchableHighlight, View } from 'react-native'
 import { connect } from 'react-redux'
+import { FontAwesome } from '@expo/vector-icons'
+
+import { SALE_CUSTOMER_NAME, SALE_AMOUNT, SALE_TIME_CREATED, SALE_ID } from '../../../constants/database/sales'
+import { SALE_PRODUCT_ID } from '../../../constants/database/salesProducts'
 
 import { loadingScreen } from '../../../constants/LoadingScreen'
+import { intToNumberCurrencyString } from '../../../constants/utils/number'
 
 import { selectAllPackage } from '../../../redux/actions/database/ProductActions'
-import { salesGot } from '../../../redux/actions/database/SaleActions'
+import { deleteSale, salesGot, selectAllActiveSaleUnPaid } from '../../../redux/actions/database/SaleActions'
+import { selectAllSaleDetailBySale } from '../../../redux/actions/database/SaleDetailActions'
+import { selectAllSaleProductBySale } from '../../../redux/actions/database/SaleProductActions'
 import { selectAllStylistService } from '../../../redux/actions/database/StylistServiceActions'
 
-import { buttonContainerStyle, buttonStyle, buttonTextStyle, highlightButtonColor } from '../../../constants/styles/employee'
-import { containerStyle } from '../../../constants/styles/customer'
-import { listContainer, listStyle } from '../../../constants/styles/customer'
+import { buttonContainerStyle, buttonStyle, buttonTextStyle, highlightButtonColor } from '../../../constants/styles/customer'
+import { containerStyle, containerStyle3 } from '../../../constants/styles/customer'
+import { iconStyle } from '../../../constants/styles/customer'
+import { listContainer, listStyle, listTextStyle } from '../../../constants/styles/customer'
+import { modifyButtonContainerStyle, modifyButtonStyle } from '../../../constants/styles/customer'
 import { titleTextStyle } from '../../../constants/styles/customer'
 
 class CustomerScreen extends Component {
@@ -50,29 +59,34 @@ class CustomerScreen extends Component {
                     const { navigate } = this.props.navigation
                     switch (this.state.process) {
                         case 'add':
-                            // let process = this.state.process
+                        case 'edit':
+                        case 'info': {
+                            let process = this.state.process
                             this.setState({ process: '' })
-                            navigate('AddCustomer', {
-                                mode: 'add',
-                                packages,
-                                stylistsServices: this.state.stylistsServices
-                            })
+                            if (process === 'add') {
+                                navigate('AddCustomer', {
+                                    mode: 'add',
+                                    sale: this.state.sale,
+                                    packages,
+                                    stylistsServices: this.state.stylistsServices
+                                })
+                            } else if (process === 'edit') {
+                                navigate('EditCustomer', {
+                                    mode: 'edit',
+                                    sale: this.state.sale,
+                                    packages,
+                                    stylistsServices: this.state.stylistsServices
+                                })
+                            } else {
+                                navigate('InfoCustomer', {
+                                    mode: 'info',
+                                    sale: this.state.sale,
+                                    packages,
+                                    stylistsServices: this.state.stylistsServices
+                                })
+                            }
                             break
-                        // case 'info':
-                        // case 'edit':
-                        //     let process = this.state.process
-                        //     this.setState({ process: '' })
-                        //     if (process === 'edit') {
-                        //         navigate('EditEmployee', {
-                        //             mode: 'edit',
-                        //             stylist: this.state.stylist
-                        //         })
-                        //     } else {
-                        //         navigate('InfoEmployee', {
-                        //             stylist: this.state.stylist
-                        //         })
-                        //     }
-                        //     break
+                        }
                         default:
                             this.setState({
                                 loading: this.state.loading + 1,
@@ -81,6 +95,66 @@ class CustomerScreen extends Component {
                             break
                     }
                     break
+                case 'deleteSale': {
+                    this.setState({ result: _result[key].result })
+                    if (_result[key].result === 'success') {
+                        this.setState({
+                            loading: this.state.loading + 1,
+                            result: ''
+                        })
+                        selectAllActiveSaleUnPaid(this.props.database.db, SALE_TIME_CREATED, 'asc', this._reinitializeCustomer)
+                    } else if (_result[key].result === 'error') {
+                        this.setState({
+                            loading: this.state.loading + 1,
+                            error: _result[key].error
+                        })
+                    }
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'saleDetailBySale': {
+                    let sale = this.state.sale
+                    let products = this.state.products
+                    for (detailIndex in _result[key]._array) {
+                        products[_result[key]._array[detailIndex][SALE_PRODUCT_ID]].packages.push(_result[key]._array[detailIndex])
+                    }
+
+                    sale['products'] = []
+                    for (saleProductId in products) {
+                        sale['products'].push(products[saleProductId])
+                    }
+
+                    this.setState({
+                        loading: this.state.loading + 1,
+                        sale
+                    })
+                    selectAllStylistService(this.props.database.db, this._reinitializeCustomer)
+
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'saleProductBySale': {
+                    let products = this.state.products
+                    for (productIndex in _result[key]._array) {
+                        products[_result[key]._array[productIndex][SALE_PRODUCT_ID]] = _result[key]._array[productIndex]
+                        products[_result[key]._array[productIndex][SALE_PRODUCT_ID]]['packages'] = []
+                    }
+
+                    this.setState({
+                        loading: this.state.loading + 1,
+                        products
+                    })
+                    selectAllSaleDetailBySale(this.props.database.db, this.state.sale[SALE_ID], this._reinitializeCustomer)
+
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'salesUnPaid': {
+                    let sales = _result[key]
+                    this.props.salesGot(sales._array, sales.length)
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
                 default: {
                     console.log('Unprocessed _result[\'' + key + '\'] = ' + JSON.stringify(_result[key]))
                     break
@@ -95,15 +169,85 @@ class CustomerScreen extends Component {
             process: 'add'
         })
         selectAllStylistService(this.props.database.db, this._reinitializeCustomer)
-        // const { navigate } = this.props.navigation
-        // navigate('AddCustomer', {
-        //     mode: 'add'
-        // })
+    }
+
+    _onInfoCustomerPressed(sale) {
+        this.setState({
+            loading: this.state.loading + 1,
+            sale,
+            process: 'info',
+            products: {}
+        })
+        selectAllSaleProductBySale(this.props.database.db, sale[SALE_ID], this._reinitializeCustomer)
+    }
+
+    _onEditCustomerPressed(sale) {
+        this.setState({
+            loading: this.state.loading + 1,
+            sale,
+            process: 'edit',
+            products: {}
+        })
+        selectAllSaleProductBySale(this.props.database.db, sale[SALE_ID], this._reinitializeCustomer)
+    }
+
+    _onRemoveCustomerPressed(sale) {
+        Alert.alert(
+            '',
+            'Are you sure you want to delete ' + sale[SALE_CUSTOMER_NAME] + '?',
+            [
+                {
+                    text: 'OK', onPress: () => {
+                        this.setState({
+                            loading: this.state.loading + 1,
+                            sale,
+                            process: 'delete',
+                            result: ''
+                        })
+                        deleteSale(this.props.database.db, sale, this._reinitializeCustomer)
+                    }
+                },
+                { text: 'Cancel', style: 'cancel' }
+            ],
+            { cancelable: true }
+        )
     }
 
     render() {
         // console.log('props = ' + JSON.stringify(this.props))
         // console.log('state = ' + JSON.stringify(this.state))
+
+        if (this.state.loading) {
+            switch (this.state.process) {
+                case 'add':
+                    if (this.state.result === '') {
+                        return loadingScreen('Collect data to create new customer', '')
+                    } else if (this.state.result === 'error') {
+                        return loadingScreen('ERROR Collect data to create new customer', this.state.error)
+                    } else {
+                        return loadingScreen('ERROR Collect data to create new customer', 'Unknown process in ' + this.state.process + ' data')
+                    }
+                case 'info':
+                case 'edit':
+                    if (this.state.result === '') {
+                        return loadingScreen('Get detail ' + this.state.sale[SALE_CUSTOMER_NAME] + ' in database', '')
+                    } else if (this.state.result === 'error') {
+                        return loadingScreen('ERROR Get detail ' + this.state.sale[SALE_CUSTOMER_NAME] + ' in database', this.state.error)
+                    } else {
+                        return loadingScreen('ERROR Get detail ' + this.state.sale[SALE_CUSTOMER_NAME] + ' in database', 'Unknown process in ' + this.state.process + ' data')
+                    }
+                case 'delete':
+                    if (this.state.result === '') {
+                        return loadingScreen('Delete ' + this.state.sale[SALE_CUSTOMER_NAME] + ' in database', '')
+                    } else if (this.state.result === 'error') {
+                        return loadingScreen('ERROR Delete ' + this.state.sale[SALE_CUSTOMER_NAME] + ' in database', this.state.error)
+                    } else {
+                        return loadingScreen('ERROR Delete ' + this.state.sale[SALE_CUSTOMER_NAME] + ' in database', 'Unknown process in delete data')
+                    }
+                default:
+                    return loadingScreen('ERROR ' + this.state.process + ': customer ' + this.state.sale[SALE_CUSTOMER_NAME], this.state.error)
+            }
+        }
 
         return (
             <View style={containerStyle}>
@@ -114,27 +258,30 @@ class CustomerScreen extends Component {
                     style={listStyle}
                     renderItem={({ item, index }) => (
                         <View style={listContainer}>
-                            {/* <Text style={listTextStyle}>{item.first_name + ' ' + item.last_name}</Text>
+                            <View style={containerStyle3}>
+                                <Text style={listTextStyle}>{item[SALE_CUSTOMER_NAME]}</Text>
+                                <Text style={listTextStyle}>{'[ Rp ' + intToNumberCurrencyString(item[SALE_AMOUNT], 0) + ',00 ]'}</Text>
+                            </View>
                             <View style={modifyButtonContainerStyle}>
                                 <TouchableHighlight
-                                    onPress={() => this._onInfoEmployeePressed(item)}
+                                    onPress={() => this._onInfoCustomerPressed(item)}
                                     style={modifyButtonStyle}
                                     underlayColor={highlightButtonColor}>
                                     <FontAwesome color='white' name='info' size={30} style={iconStyle} />
                                 </TouchableHighlight>
                                 <TouchableHighlight
-                                    onPress={() => this._onEditEmployeePressed(item)}
+                                    onPress={() => this._onEditCustomerPressed(item)}
                                     style={modifyButtonStyle}
                                     underlayColor={highlightButtonColor}>
                                     <FontAwesome color='white' name='pencil' size={30} style={iconStyle} />
                                 </TouchableHighlight>
                                 <TouchableHighlight
-                                    onPress={() => this._onRemoveEmployeePressed(item)}
+                                    onPress={() => this._onRemoveCustomerPressed(item)}
                                     style={modifyButtonStyle}
                                     underlayColor={highlightButtonColor}>
                                     <FontAwesome color='white' name='remove' size={32} style={iconStyle} />
                                 </TouchableHighlight>
-                            </View> */}
+                            </View>
                         </View>
                     )}
                 />

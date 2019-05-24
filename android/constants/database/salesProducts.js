@@ -1,4 +1,4 @@
-import { PRODUCT_ID, PRODUCTS_DETAILS_SCHEMA } from './productsDetails'
+import { PRODUCT_ID, PRODUCT_PACKAGE, PRODUCTS_DETAILS_SCHEMA } from './productsDetails'
 import { SALE_ID, SALES_SCHEMA } from './sales'
 
 export const SALES_PRODUCTS_SCHEMA = 'sales_products'
@@ -30,4 +30,16 @@ export const insertSaleProductQuery = (saleProduct) => {
 export const deleteSaleProductQuery = (sale_id) => {
     return 'DELETE FROM ' + SALES_PRODUCTS_SCHEMA +
         ' WHERE ' + SALE_ID + ' = ' + sale_id
+}
+
+export const selectAllSaleProductBySaleQuery = (sale_id) => {
+    return 'SELECT ' +
+        'a.' + SALE_PRODUCT_ID + ' AS ' + SALE_PRODUCT_ID + ', ' +
+        'a.' + SALE_ID + ' AS ' + SALE_ID + ', ' +
+        'a.' + PRODUCT_ID + ' AS ' + PRODUCT_ID + ', ' +
+        'a.' + SALE_PRODUCT_PRICE + ' AS ' + SALE_PRODUCT_PRICE + ', ' +
+        'b.' + PRODUCT_PACKAGE + ' AS ' + PRODUCT_PACKAGE +
+        ' FROM ' + SALES_PRODUCTS_SCHEMA + ' a' +
+        ' LEFT JOIN ' + PRODUCTS_DETAILS_SCHEMA + ' b on a.' + PRODUCT_ID + ' = b.' + PRODUCT_ID +
+        ' WHERE a.' + SALE_ID + ' = ' + sale_id
 }

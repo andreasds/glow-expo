@@ -197,7 +197,7 @@ class EmployeeScreen extends Component {
                         return loadingScreen('ERROR Delete ' + this.state.stylist[STYLIST_FIRST_NAME] + ' in database', 'Unknown process in delete data')
                     }
                 default:
-                    return loadingScreen('ERROR ' + this.state.process + ': product ' + this.state.stylist[STYLIST_FIRST_NAME], this.state.error)
+                    return loadingScreen('ERROR ' + this.state.process + ': employee ' + this.state.stylist[STYLIST_FIRST_NAME], this.state.error)
             }
         }
 

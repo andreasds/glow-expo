@@ -75,13 +75,20 @@ export const iconStyle = {
 }
 
 export const listContainer = {
+    alignItems: 'center',
     backgroundColor: 'lightslategrey',
     borderRadius: width * 0.02,
     flex: 1,
-    flexDirection: 'column',
+    flexDirection: 'row',
     margin: width * 0.003,
     minHeight: width * 0.15,
     padding: width * 0.02
+}
+
+export const listContainer2 = {
+    ...listContainer,
+    alignItems: 'stretch',
+    flexDirection: 'column'
 }
 
 export const listStyle = {
@@ -93,6 +100,15 @@ export const listStyle = {
 export const listStyle2 = {
     ...listStyle,
     backgroundColor: 'white'
+}
+
+export const listTextStyle = {
+    color: 'white',
+    flex: 1,
+    fontSize: width * 0.06,
+    minHeight: width * 0.1,
+    marginHorizontal: width * 0.01,
+    textAlignVertical: 'center'
 }
 
 export const modifyButtonContainerStyle = {

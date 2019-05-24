@@ -32,3 +32,13 @@ export const deleteSaleDetailQuery = (sale_id) => {
         ' WHERE ' + SALE_ID + ' = ' + sale_id +
         ' )'
 }
+
+export const selectAllSaleDetailBySaleQuery = (sale_id) => {
+    return 'SELECT ' +
+        'a.' + SALE_PRODUCT_ID + ' AS ' + SALE_PRODUCT_ID + ', ' +
+        'a.' + STYLIST_ID + ' AS ' + STYLIST_ID + ', ' +
+        'a.' + PRODUCT_ID + ' AS ' + PRODUCT_ID +
+        ' FROM ' + SALES_DETAILS_SCHEMA + ' a' +
+        ' LEFT JOIN ' + SALES_PRODUCTS_SCHEMA + ' b ON a.' + SALE_PRODUCT_ID + ' = b.' + SALE_PRODUCT_ID +
+        ' WHERE b.' + SALE_ID + ' = ' + sale_id
+}
