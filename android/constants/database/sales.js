@@ -10,7 +10,7 @@ export const SALE_DISCOUNT_AMOUNT = 'discount_amount'
 export const SALE_AMOUNT_PAID = 'sale_amount_paid'
 export const SALE_ACTIVE = 'active'
 
-export const CURRENT_TIMESTAMP = 'CURRENT_TIMESTAMP'
+export const CURRENT_TIMESTAMP = 'datetime(CURRENT_TIMESTAMP, \'localtime\')'
 
 export const createSaleTableQuery = () => {
     return 'CREATE TABLE IF NOT EXISTS ' + SALES_SCHEMA + ' (' +

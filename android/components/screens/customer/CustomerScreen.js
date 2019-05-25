@@ -15,7 +15,7 @@ import { selectAllSaleDetailBySale } from '../../../redux/actions/database/SaleD
 import { selectAllSaleProductBySale } from '../../../redux/actions/database/SaleProductActions'
 import { selectAllStylistService } from '../../../redux/actions/database/StylistServiceActions'
 
-import { buttonContainerStyle, buttonStyle, buttonTextStyle, highlightButtonColor } from '../../../constants/styles/customer'
+import { buttonContainerStyle, buttonStyle, buttonTextStyle2, highlightButtonColor } from '../../../constants/styles/customer'
 import { containerStyle, containerStyle3 } from '../../../constants/styles/customer'
 import { iconStyle } from '../../../constants/styles/customer'
 import { listContainer, listStyle, listTextStyle } from '../../../constants/styles/customer'
@@ -288,7 +288,13 @@ class CustomerScreen extends Component {
                         onPress={() => this._onAddCustomerPressed()}
                         style={buttonStyle}
                         underlayColor={highlightButtonColor}>
-                        <Text style={buttonTextStyle}>ADD CUSTOMER</Text>
+                        <Text style={buttonTextStyle2}>ADD CUSTOMER</Text>
+                    </TouchableHighlight>
+                    <TouchableHighlight
+                        onPress={() => this._onHistoryPressed()}
+                        style={buttonStyle}
+                        underlayColor={highlightButtonColor}>
+                        <Text style={buttonTextStyle2}>HISTORY</Text>
                     </TouchableHighlight>
                 </View>
             </View>

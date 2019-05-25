@@ -30,6 +30,15 @@ export const buttonTextStyle = {
     textAlignVertical: 'center'
 }
 
+export const buttonTextStyle2 = {
+    color: 'white',
+    fontSize: width * 0.055,
+    fontWeight: 'bold',
+    height: width * 0.11,
+    textAlign: 'center',
+    textAlignVertical: 'center'
+}
+
 export const containerStyle = {
     backgroundColor: 'black',
     flex: 1,

@@ -222,6 +222,10 @@ class HomeScreen extends Component {
 
     }
 
+    _onSummaryButtonPressed() {
+
+    }
+
     render() {
         // console.log('props = ' + JSON.stringify(this.props))
         // console.log('state = ' + JSON.stringify(this.state))
@@ -281,6 +285,12 @@ class HomeScreen extends Component {
                     style={buttonStyle}
                     underlayColor={highlightButtonColor}>
                     <Text style={buttonTextStyle}>PRINTER</Text>
+                </TouchableHighlight>
+                <TouchableHighlight
+                    onPress={() => this._onSummaryButtonPressed()}
+                    style={buttonStyle}
+                    underlayColor={highlightButtonColor}>
+                    <Text style={buttonTextStyle}>SUMMARY</Text>
                 </TouchableHighlight>
             </View>
         )
