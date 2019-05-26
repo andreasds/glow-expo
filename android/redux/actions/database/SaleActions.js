@@ -2,6 +2,7 @@ import {
     createSaleTableQuery,
     deleteSaleQuery,
     insertSaleQuery,
+    selectAllActiveSalePaidQuery,
     selectAllActiveSaleUnPaidQuery,
     updateSaleQuery
 } from '../../../constants/database/sales'
@@ -76,6 +77,31 @@ export const deleteSale = (db, sale, _callback) => {
                 },
                 (error) => {
                     _callback({ deleteSale: { result: 'error', error } })
+                }
+            )
+        },
+        (error) => { },
+        (success) => { }
+    )
+}
+
+export const selectAllActiveSalePaid = (db, startDate, endDate, sort, order, _callback) => {
+    db.transaction(
+        (tx) => {
+            tx.executeSql(selectAllActiveSalePaidQuery(startDate, endDate, sort, order), [],
+                (_, success) => {
+                    // success = {"rowsAffected":0,"rows":{"_array":[{"stylist_id":2,"sale_id":11,"price":50000},{"stylist_id":4,"sale_id":11,"price":50000}],"length":2}}
+                    _callback({
+                        salesPaid: {
+                            _array: success.rows._array,
+                            length: success.rows.length,
+                            startDate,
+                            endDate
+                        }
+                    })
+                },
+                (error) => {
+                    _callback({ salesPaid: { result: 'error', error } })
                 }
             )
         },

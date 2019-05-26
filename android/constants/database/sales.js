@@ -59,6 +59,20 @@ export const deleteSaleQuery = (sale) => {
         SALE_ID + ' = ' + sale[SALE_ID]
 }
 
+export const selectAllActiveSalePaidQuery = (startDate, endDate, sort, order) => {
+    let query = 'SELECT * FROM ' + SALES_SCHEMA +
+        ' WHERE ' +
+        SALE_ACTIVE + ' = \'Y\' AND ' +
+        SALE_TIME_PAID + ' >= datetime(\'' + startDate + ' 00:00:00\') AND ' +
+        SALE_TIME_PAID + ' <= datetime(\'' + endDate + ' 24:00:00\')'
+    if (sort) {
+        query += ' ORDER BY ' + sort
+        if (order === 'desc') query += ' DESC'
+        else query += ' ASC'
+    }
+    return query
+}
+
 export const selectAllActiveSaleUnPaidQuery = (sort, order) => {
     let query = 'SELECT * FROM ' + SALES_SCHEMA +
         ' WHERE ' +

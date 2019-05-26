@@ -5,6 +5,10 @@ const height = Dimensions.get('window').height
 
 export const highlightButtonColor = 'grey'
 
+export const activityIndicatorStyle = {
+    margin: width * 0.015
+}
+
 export const buttonContainerStyle = {
     flex: 1,
     flexDirection: 'row',
@@ -83,9 +87,39 @@ export const containerStyle6 = {
     backgroundColor: 'lightslategrey'
 }
 
+export const dateButtonStyle = {
+    backgroundColor: 'darkslategrey',
+    borderRadius: width * 0.015,
+    justifyContent: 'center',
+    margin: width * 0.01,
+    width: width * 0.1
+}
+
+export const dateContainerStyle = {
+    flex: 1,
+    flexDirection: 'row',
+    maxHeight: width * 0.12
+}
+
+export const dateTextInputStyle = {
+    backgroundColor: 'white',
+    borderRadius: width * 0.015,
+    flex: 1,
+    fontSize: width * 0.045,
+    margin: width * 0.01,
+    padding: width * 0.02,
+    textAlign: 'center',
+    textAlignVertical: 'center'
+}
+
 export const iconStyle = {
     textAlign: 'center',
     textAlignVertical: 'center'
+}
+
+export const lineStyle = {
+    borderBottomColor: 'white',
+    borderBottomWidth: 3
 }
 
 export const listContainer = {

@@ -3,14 +3,15 @@ import { Alert, FlatList, Text, TouchableHighlight, View } from 'react-native'
 import { connect } from 'react-redux'
 import { FontAwesome } from '@expo/vector-icons'
 
-import { SALE_CUSTOMER_NAME, SALE_AMOUNT, SALE_TIME_CREATED, SALE_ID } from '../../../constants/database/sales'
+import { SALE_AMOUNT, SALE_CUSTOMER_NAME, SALE_ID, SALE_TIME_CREATED, SALE_TIME_PAID } from '../../../constants/database/sales'
 import { SALE_PRODUCT_ID } from '../../../constants/database/salesProducts'
 
 import { loadingScreen } from '../../../constants/LoadingScreen'
+import { getCurrentDate } from '../../../constants/utils/date'
 import { intToNumberCurrencyString } from '../../../constants/utils/number'
 
 import { selectAllPackage } from '../../../redux/actions/database/ProductActions'
-import { deleteSale, salesGot, selectAllActiveSaleUnPaid } from '../../../redux/actions/database/SaleActions'
+import { deleteSale, salesGot, selectAllActiveSalePaid, selectAllActiveSaleUnPaid } from '../../../redux/actions/database/SaleActions'
 import { selectAllSaleDetailBySale } from '../../../redux/actions/database/SaleDetailActions'
 import { selectAllSaleProductBySale } from '../../../redux/actions/database/SaleProductActions'
 import { selectAllStylistService } from '../../../redux/actions/database/StylistServiceActions'
@@ -147,6 +148,27 @@ class CustomerScreen extends Component {
                     this.setState({ loading: this.state.loading - 1 })
                     break
                 }
+                case 'salesPaid': {
+                    if (_result[key].result === 'error') {
+                        this.setState({
+                            error: _result[key].error,
+                            result: _result[key].result
+                        })
+                    } else {
+                        this.setState({
+                            loading: this.state.loading - 1,
+                            process: ''
+                        })
+                        let sales = _result[key]._array
+                        const { navigate } = this.props.navigation
+                        navigate('HistoryCustomer', {
+                            sales,
+                            startDate: _result[key].startDate,
+                            endDate: _result[key].endDate
+                        })
+                    }
+                    break
+                }
                 case 'salesUnPaid': {
                     let sales = _result[key]
                     this.props.salesGot(sales._array, sales.length)
@@ -211,6 +233,15 @@ class CustomerScreen extends Component {
         )
     }
 
+    _onHistoryCustomerPressed() {
+        this.setState({
+            loading: this.state.loading + 1,
+            process: 'history'
+        })
+        let current_date = getCurrentDate()
+        selectAllActiveSalePaid(this.props.database.db, current_date, current_date, SALE_TIME_PAID, 'desc', this._reinitializeCustomer)
+    }
+
     render() {
         // console.log('props = ' + JSON.stringify(this.props))
         // console.log('state = ' + JSON.stringify(this.state))
@@ -241,6 +272,14 @@ class CustomerScreen extends Component {
                         return loadingScreen('ERROR Delete ' + this.state.sale[SALE_CUSTOMER_NAME] + ' in database', this.state.error)
                     } else {
                         return loadingScreen('ERROR Delete ' + this.state.sale[SALE_CUSTOMER_NAME] + ' in database', 'Unknown process in delete data')
+                    }
+                case 'history':
+                    if (this.state.result === '') {
+                        return loadingScreen('Collect history customer', '')
+                    } else if (this.state.result === 'error') {
+                        return loadingScreen('ERROR Collect history customer', this.state.error)
+                    } else {
+                        return loadingScreen('ERROR Collect history customer', 'Unknown process in ' + this.state.process + ' data')
                     }
                 default:
                     return loadingScreen('ERROR ' + this.state.process + ': customer ' + this.state.sale[SALE_CUSTOMER_NAME], this.state.error)
@@ -291,7 +330,7 @@ class CustomerScreen extends Component {
                         <Text style={buttonTextStyle2}>ADD CUSTOMER</Text>
                     </TouchableHighlight>
                     <TouchableHighlight
-                        onPress={() => this._onHistoryPressed()}
+                        onPress={() => this._onHistoryCustomerPressed()}
                         style={buttonStyle}
                         underlayColor={highlightButtonColor}>
                         <Text style={buttonTextStyle2}>HISTORY</Text>
