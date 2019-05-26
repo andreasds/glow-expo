@@ -112,6 +112,14 @@ export const dateTextInputStyle = {
     textAlignVertical: 'center'
 }
 
+export const dateTextStyle = {
+    color: 'white',
+    flex: 1,
+    fontSize: width * 0.03,
+    marginHorizontal: width * 0.01,
+    textAlignVertical: 'center'
+}
+
 export const iconStyle = {
     textAlign: 'center',
     textAlignVertical: 'center'

@@ -79,6 +79,7 @@ class CustomerScreen extends Component {
                                 })
                             } else {
                                 navigate('InfoCustomer', {
+                                    mode: 'info',
                                     sale: this.state.sale,
                                     packages,
                                     stylistsServices: this.state.stylistsServices

@@ -27,10 +27,12 @@ class InfoCustomerScreen extends Component {
         super(props)
 
         const { navigation } = this.props
+        let mode = navigation.getParam('mode', '')
         let sale = navigation.getParam('sale', {})
         let packages = navigation.getParam('packages', {})
         let stylistsServices = navigation.getParam('stylistsServices', {})
         this.state = {
+            mode,
             sale,
             packages,
             stylistsServices,
@@ -61,11 +63,17 @@ class InfoCustomerScreen extends Component {
                     let sales = _result[key]
                     this.props.salesGot(sales._array, sales.length)
 
-                    this.setState({
-                        loading: this.state.loading + 1,
-                        process: 'print'
-                    })
-                    this._onPrintRoutine()
+                    if (this.state.mode === 'info') {
+                        this.setState({
+                            loading: this.state.loading + 1,
+                            process: 'print'
+                        })
+                        this._onPrintRoutine()
+                    } else {
+                        this.props.navigation.state.params.onGoBack()
+                        const { goBack } = this.props.navigation
+                        goBack()
+                    }
 
                     this.setState({ loading: this.state.loading - 1 })
                     break
@@ -92,7 +100,8 @@ class InfoCustomerScreen extends Component {
     }
 
     _onBackButtonPressed() {
-        if (this.state.sale[SALE_TIME_PAID] === null) {
+        if (this.state.sale[SALE_TIME_PAID] === null ||
+            this.state.mode === 'history') {
             const { goBack } = this.props.navigation
             goBack()
         } else {
@@ -177,6 +186,30 @@ class InfoCustomerScreen extends Component {
                 { cancelable: true }
             )
         }
+    }
+
+    _onCancelButtonPressed() {
+        Alert.alert(
+            '',
+            'Are you sure you want to cancel this ' + this.state.sale[SALE_CUSTOMER_NAME] + '\'s transaction?',
+            [
+                {
+                    text: 'OK', onPress: () => {
+                        this.setState({ loading: this.state.loading + 1 })
+                        let sale = this.state.sale
+                        sale[SALE_TIME_PAID] = null
+                        sale[SALE_AMOUNT_PAID] = 0
+                        this.setState({
+                            sale,
+                            process: 'update'
+                        })
+                        updateSale(this.props.database.db, sale, this._reinitializeInfoCustomer)
+                    }
+                },
+                { text: 'Cancel', style: 'cancel' }
+            ],
+            { cancelable: true }
+        )
     }
 
     _getProductName(product_id) {
@@ -291,13 +324,27 @@ class InfoCustomerScreen extends Component {
                         </View>
                     </TouchableHighlight>
                     {
-                        this.state.sale[SALE_TIME_PAID] === null ?
+                        this.state.sale[SALE_TIME_PAID] === null &&
+                            this.state.mode === 'info' ?
                             <TouchableHighlight
                                 onPress={() => this._onEditButtonPressed()}
                                 style={buttonStyle}
                                 underlayColor={highlightButtonColor}>
                                 <View>
                                     <Text style={buttonTextStyle}>EDIT</Text>
+                                </View>
+                            </TouchableHighlight> :
+                            null
+                    }
+                    {
+                        this.state.sale[SALE_TIME_PAID] !== null &&
+                            this.state.mode === 'history' ?
+                            <TouchableHighlight
+                                onPress={() => this._onCancelButtonPressed()}
+                                style={buttonStyle}
+                                underlayColor={highlightButtonColor}>
+                                <View>
+                                    <Text style={buttonTextStyle}>CANCEL</Text>
                                 </View>
                             </TouchableHighlight> :
                             null
