@@ -313,6 +313,11 @@ class InfoCustomerScreen extends Component {
                             </View>
                         )}
                     />
+                    {
+                        this.state.sale[SALE_TIME_PAID] !== null ?
+                            <Text style={textStyle}>{'PAID: ' + this.state.sale[SALE_TIME_PAID]}</Text> :
+                            null
+                    }
                 </ScrollView>
                 <View style={buttonContainerStyle}>
                     <TouchableHighlight
