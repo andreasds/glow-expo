@@ -13,7 +13,7 @@ import { summaryProducts } from '../../redux/actions/database/SaleProductActions
 
 import { activityIndicatorStyle } from '../../constants/styles/summary'
 import { highlightButtonColor } from '../../constants/styles/summary'
-import { containerStyle, containerStyle5, pickerContainer } from '../../constants/styles/summary'
+import { containerStyle, containerStyle2, pickerContainer } from '../../constants/styles/summary'
 import { dateButtonStyle, dateContainerStyle, dateTextInputStyle } from '../../constants/styles/summary'
 import { iconStyle } from '../../constants/styles/summary'
 import { lineStyle } from '../../constants/styles/summary'
@@ -214,7 +214,7 @@ class SummaryScreen extends Component {
                                         keyExtractor={(productItem, productIndex) => productIndex.toString()}
                                         style={listStyle2}
                                         renderItem={({ item, index }) => (
-                                            <View style={containerStyle5}>
+                                            <View style={containerStyle2}>
                                                 <Text style={countTextStyle}>{item.count}</Text>
                                                 <Text style={listTextStyle}>
                                                     {
