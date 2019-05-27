@@ -94,7 +94,7 @@ export const summaryProducts = (db, startDate, endDate, _callback) => {
         (tx) => {
             tx.executeSql(summaryProductsQuery(startDate, endDate), [],
                 (_, success) => {
-                    // success = {"rowsAffected":0,"rows":{"_array":[{"stylist_id":4,"first_name":"Anang","last_name":"Budi","active":"Y"},{"stylist_id":6,"first_name":"Ngok","last_name":"Tet","active":"Y"}],"length":2}}
+                    // success = {"rowsAffected":0,"rows":{"_array":[{"count":1,"product_id":1,"name":"Gunting Cewe"},{"count":1,"product_id":3,"name":"Gunting Cowo"},{"count":1,"product_id":5,"name":"Highlight"},{"count":1,"product_id":6,"name":"Paket Cewe"}],"length":4}}
                     _callback({
                         summaryProducts: {
                             _array: success.rows._array,
