@@ -1,7 +1,7 @@
-import { PRODUCT_ID, PRODUCTS_DETAILS_SCHEMA } from './productsDetails'
-import { SALE_ID } from './sales'
+import { PRODUCT_ID, PRODUCT_NAME, PRODUCTS_DETAILS_SCHEMA } from './productsDetails'
+import { SALE_ACTIVE, SALE_ID, SALE_TIME_PAID, SALES_SCHEMA } from './sales'
 import { SALE_PRODUCT_ID, SALES_PRODUCTS_SCHEMA } from './salesProducts'
-import { STYLIST_ID, STYLISTS_SCHEMA } from './stylists'
+import { STYLIST_ID, STYLIST_FIRST_NAME, STYLIST_LAST_NAME, STYLISTS_SCHEMA } from './stylists'
 
 export const SALES_DETAILS_SCHEMA = 'sales_details'
 
@@ -41,4 +41,34 @@ export const selectAllSaleDetailBySaleQuery = (sale_id) => {
         ' FROM ' + SALES_DETAILS_SCHEMA + ' a' +
         ' LEFT JOIN ' + SALES_PRODUCTS_SCHEMA + ' b ON a.' + SALE_PRODUCT_ID + ' = b.' + SALE_PRODUCT_ID +
         ' WHERE b.' + SALE_ID + ' = ' + sale_id
+}
+
+export const summaryStylistsQuery = (startDate, endDate) => {
+    return 'SELECT' +
+        ' count(e.' + PRODUCT_ID + ') AS count,' +
+        ' e.' + PRODUCT_ID + ' AS package_id,' +
+        ' e.' + PRODUCT_NAME + ' AS package_name,' +
+        ' b.' + PRODUCT_ID + ' AS ' + PRODUCT_ID + ',' +
+        ' b.' + PRODUCT_NAME + ' AS product_name,' +
+        ' c.' + STYLIST_ID + ' AS ' + STYLIST_ID + ',' +
+        ' c.' + STYLIST_FIRST_NAME + ' AS ' + STYLIST_FIRST_NAME + ',' +
+        ' c.' + STYLIST_LAST_NAME + ' AS ' + STYLIST_LAST_NAME +
+        ' FROM ' + SALES_DETAILS_SCHEMA + ' a' +
+        ' LEFT JOIN ' + PRODUCTS_DETAILS_SCHEMA + ' b ON a.' + PRODUCT_ID + ' = b.' + PRODUCT_ID +
+        ' LEFT JOIN ' + STYLISTS_SCHEMA + ' c ON a.' + STYLIST_ID + ' = c.' + STYLIST_ID +
+        ' LEFT JOIN ' + SALES_PRODUCTS_SCHEMA + ' d ON a.' + SALE_PRODUCT_ID + ' = d.' + SALE_PRODUCT_ID +
+        ' LEFT JOIN ' + PRODUCTS_DETAILS_SCHEMA + ' e ON d.' + PRODUCT_ID + ' = e.' + PRODUCT_ID +
+        ' LEFT JOIN ' + SALES_SCHEMA + ' f ON d.' + SALE_ID + ' = f.' + SALE_ID +
+        ' WHERE' +
+        ' f.' + SALE_TIME_PAID + ' >= datetime(\'' + startDate + ' 00:00:00\') AND' +
+        ' f.' + SALE_TIME_PAID + ' <= datetime(\'' + endDate + ' 24:00:00\') AND' +
+        ' f.' + SALE_ACTIVE + ' = \'Y\'' +
+        ' GROUP BY' +
+        ' c.' + STYLIST_ID + ',' +
+        ' b.' + PRODUCT_ID + ',' +
+        ' e.' + PRODUCT_ID +
+        ' ORDER BY' +
+        ' c.' + STYLIST_FIRST_NAME + ' ASC,' +
+        ' b.' + PRODUCT_NAME + ' ASC,' +
+        ' e.' + PRODUCT_NAME + ' ASC'
 }

@@ -1,5 +1,5 @@
-import { PRODUCT_ID, PRODUCT_PACKAGE, PRODUCTS_DETAILS_SCHEMA } from './productsDetails'
-import { SALE_ID, SALES_SCHEMA } from './sales'
+import { PRODUCT_ID, PRODUCT_NAME, PRODUCT_PACKAGE, PRODUCTS_DETAILS_SCHEMA } from './productsDetails'
+import { SALE_ACTIVE, SALE_ID, SALE_TIME_PAID, SALES_SCHEMA } from './sales'
 
 export const SALES_PRODUCTS_SCHEMA = 'sales_products'
 
@@ -42,4 +42,22 @@ export const selectAllSaleProductBySaleQuery = (sale_id) => {
         ' FROM ' + SALES_PRODUCTS_SCHEMA + ' a' +
         ' LEFT JOIN ' + PRODUCTS_DETAILS_SCHEMA + ' b on a.' + PRODUCT_ID + ' = b.' + PRODUCT_ID +
         ' WHERE a.' + SALE_ID + ' = ' + sale_id
+}
+
+export const summaryProductsQuery = (startDate, endDate) => {
+    return 'SELECT' +
+        ' count(b.' + PRODUCT_ID + ') AS count,' +
+        ' b.' + PRODUCT_ID + ' AS ' + PRODUCT_ID + ',' +
+        ' b.' + PRODUCT_NAME + ' AS ' + PRODUCT_NAME +
+        ' FROM ' + SALES_PRODUCTS_SCHEMA + ' a' +
+        ' LEFT JOIN ' + PRODUCTS_DETAILS_SCHEMA + ' b ON a.' + PRODUCT_ID + ' = b.' + PRODUCT_ID +
+        ' LEFT JOIN ' + SALES_SCHEMA + ' c ON a.' + SALE_ID + ' = c.' + SALE_ID +
+        ' WHERE' +
+        ' c.' + SALE_TIME_PAID + ' >= datetime(\'' + startDate + ' 00:00:00\') AND' +
+        ' c.' + SALE_TIME_PAID + ' <= datetime(\'' + endDate + ' 24:00:00\') AND' +
+        ' c.' + SALE_ACTIVE + ' = \'Y\'' +
+        ' GROUP BY' +
+        ' b.' + PRODUCT_ID +
+        ' ORDER BY' +
+        ' b.' + PRODUCT_NAME + ' ASC'
 }

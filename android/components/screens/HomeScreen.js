@@ -12,6 +12,7 @@ import { buttonStyle, buttonTextStyle, highlightButtonColor } from '../../consta
 import { containerStyle } from '../../constants/styles/home'
 
 import { loadingScreen } from '../../constants/LoadingScreen'
+import { getCurrentDate } from '../../constants/utils/date'
 
 import { databaseOpened } from '../../redux/actions/DatabaseActions'
 import { stylistsGot } from '../../redux/actions/database/StylistActions'
@@ -21,7 +22,7 @@ import { createProductTable } from '../../redux/actions/database/ProductActions'
 import { createProductDetailTable, selectAllActiveProduct } from '../../redux/actions/database/ProductDetailActions'
 import { createSaleTable, salesGot, selectAllActiveSaleUnPaid } from '../../redux/actions/database/SaleActions'
 import { createSaleDetailTable } from '../../redux/actions/database/SaleDetailActions'
-import { createSaleProductTable } from '../../redux/actions/database/SaleProductActions'
+import { createSaleProductTable, summaryProducts } from '../../redux/actions/database/SaleProductActions'
 import { createStylistTable, getStylist, insertStylist, selectAllActiveStylist } from '../../redux/actions/database/StylistActions'
 import { createStylistServiceTable } from '../../redux/actions/database/StylistServiceActions'
 import { createVersionTable, getLastVersion, insertCurrentVersion } from '../../redux/actions/database/VersionActions'
@@ -150,6 +151,18 @@ class HomeScreen extends Component {
                     this.setState({ loading: this.state.loading - 1 })
                     break
                 }
+                case 'summaryProducts': {
+                    this.setState({ loading: this.state.loading - 1 })
+                    let summaries = _result[key]._array
+                    const { navigate } = this.props.navigation
+                    navigate('Summary', {
+                        summaries,
+                        filter: 'product',
+                        startDate: _result[key].startDate,
+                        endDate: _result[key].endDate
+                    })
+                    break
+                }
                 case 'stylist': {
                     let stylist = _result[key]
                     if (stylist.length === 1) {
@@ -223,7 +236,9 @@ class HomeScreen extends Component {
     }
 
     _onSummaryButtonPressed() {
-
+        this.setState({ loading: this.state.loading + 1 })
+        let current_date = getCurrentDate()
+        summaryProducts(this.props.database.db, current_date, current_date, this._reinitializeHome)
     }
 
     render() {
