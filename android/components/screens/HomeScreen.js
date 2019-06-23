@@ -214,6 +214,14 @@ class HomeScreen extends Component {
 
             this.props.databaseOpened(db)
         }
+
+        // if (!this.props.bluetooth.isEnable) {
+        //     BluetoothManager.isBluetoothEnabled().then((enabled) => {
+        //         console.log("Bluetooth enable = " + JSON.stringify(enabled))
+        //     }, (error) => {
+        //         console.log("Bluetooth error = " + JSON.stringify(error))
+        //     })
+        // }
     }
 
     _onCustomerButtonPressed() {
@@ -313,11 +321,13 @@ class HomeScreen extends Component {
 }
 
 const mapStateToProps = state => {
+    const { isEnable } = state.bluetoothReducers
     const { db } = state.databaseReducers
     const { products, productsLen } = state.productReducers
     const { sales, salesLen } = state.saleReducers
     const { stylists, stylistsLen } = state.stylistReducers
     return {
+        bluetooth: { isEnable },
         database: { db },
         product: { products, productsLen },
         sale: { sales, salesLen },
