@@ -2,6 +2,8 @@ package com.glow;
 
 import com.facebook.react.ReactActivity;
 
+import android.content.Intent; // react-native-orientation
+import android.content.res.Configuration; // react-native-orientation
 import com.facebook.react.ReactActivityDelegate; // react-native-gesture-handler
 import com.facebook.react.ReactRootView; // react-native-gesture-handler
 import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView; // react-native-gesture-handler
@@ -25,5 +27,13 @@ public class MainActivity extends ReactActivity {
                 return new RNGestureHandlerEnabledRootView(MainActivity.this);
             }
         };
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Intent intent = new Intent("onConfigurationChanged");
+        intent.putExtra("newConfig", newConfig);
+        this.sendBroadcast(intent);
     }
 }

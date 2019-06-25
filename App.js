@@ -8,6 +8,7 @@
 
 import React, { Component } from 'react'
 import { Platform, StatusBar, StyleSheet, Text, View } from 'react-native'
+import Orientation from 'react-native-orientation'
 
 import { Provider } from 'react-redux'
 import store from './src/android/redux/store'
@@ -22,6 +23,10 @@ const instructions = Platform.select({
 })
 
 export default class App extends Component {
+  componentDidMount() {
+    Orientation.lockToPortrait()
+  }
+
   render() {
     if (Platform.OS === 'android') {
       return (
