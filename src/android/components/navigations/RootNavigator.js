@@ -1,5 +1,5 @@
 import { createAppContainer, createStackNavigator } from 'react-navigation'
-// import { connect } from 'react-redux'
+import { connect } from 'react-redux'
 
 import HomeScreen from '../screens/HomeScreen'
 // import CustomerNavigator from '../navigations/CustomerNavigator'
@@ -25,5 +25,4 @@ RootNavigator.navigationOptions = () => {
 
 const getAppNavigator = createAppContainer(RootNavigator)
 
-// export default connect()(getAppNavigator)
-export default getAppNavigator
+export default connect()(getAppNavigator)

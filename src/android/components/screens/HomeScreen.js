@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Platform, StyleSheet, Text, View } from 'react-native'
+import { connect } from 'react-redux'
 
 const instructions = Platform.select({
     ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -18,6 +19,9 @@ class HomeScreen extends Component {
     }
 
     render() {
+        console.log('props = ' + JSON.stringify(this.props))
+        console.log('state = ' + JSON.stringify(this.state))
+
         return (
             <View style={styles.container}>
                 <Text style={styles.welcome}>Welcome to Android React Native!</Text>
@@ -47,4 +51,26 @@ const styles = StyleSheet.create({
     },
 })
 
-export default HomeScreen
+const mapStateToProps = state => {
+    const { isEnable } = state.bluetoothReducers
+    const { db } = state.databaseReducers
+    const { products, productsLen } = state.productReducers
+    const { sales, salesLen } = state.saleReducers
+    const { stylists, stylistsLen } = state.stylistReducers
+    return {
+        bluetooth: { isEnable },
+        database: { db },
+        product: { products, productsLen },
+        sale: { sales, salesLen },
+        stylist: { stylists, stylistsLen }
+    }
+}
+
+const mapDispatchToProps = dispatch => ({
+    // databaseOpened: (db) => dispatch(databaseOpened(db)),
+    // productsGot: (products, productsLen) => dispatch(productsGot(products, productsLen)),
+    // salesGot: (sales, salesLen) => dispatch(salesGot(sales, salesLen)),
+    // stylistsGot: (stylists, stylistsLen) => dispatch(stylistsGot(stylists, stylistsLen))
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen)

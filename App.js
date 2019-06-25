@@ -7,7 +7,10 @@
  */
 
 import React, { Component } from 'react'
-import { Platform, StyleSheet, Text, View } from 'react-native'
+import { Platform, StatusBar, StyleSheet, Text, View } from 'react-native'
+
+import { Provider } from 'react-redux'
+import store from './src/android/redux/store'
 
 import RootNavigator from './src/android/components/navigations/RootNavigator'
 
@@ -22,7 +25,10 @@ export default class App extends Component {
   render() {
     if (Platform.OS === 'android') {
       return (
-        <RootNavigator />
+        <Provider store={store}>
+          <StatusBar barStyle='light-content' hidden={true} />
+          <RootNavigator />
+        </Provider>
       )
     } else {
       return (
