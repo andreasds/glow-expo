@@ -1,54 +1,49 @@
-import React, { Component } from 'react'
-import { Platform, StatusBar, Text, View } from 'react-native'
-import { FontAwesome } from '@expo/vector-icons'
-import { AppLoading, Font, ScreenOrientation } from 'expo'
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ * @flow
+ */
 
-import { Provider } from 'react-redux'
-import store from './android/redux/store'
+import React, {Component} from 'react';
+import {Platform, StyleSheet, Text, View} from 'react-native';
 
-import RootNavigator from './android/components/navigations/RootNavigator'
+const instructions = Platform.select({
+  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
+  android:
+    'Double tap R on your keyboard to reload,\n' +
+    'Shake or press menu button for dev menu',
+});
 
-class App extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      isReady: false
-    }
-
-    ScreenOrientation.allowAsync("PORTRAIT")
-  }
-
-  async _loadAssetsAsync() {
-    const fontAssets = [FontAwesome.font].map(font => Font.loadAsync(font))
-
-    await Promise.all([...fontAssets])
-  }
-
+type Props = {};
+export default class App extends Component<Props> {
   render() {
-    if (Platform.OS === 'android') {
-      if (!this.state.isReady) {
-        return (
-          <AppLoading
-            startAsync={this._loadAssetsAsync}
-            onFinish={() => this.setState({ isReady: true })}
-            onError={console.warn} />
-        )
-      } else {
-        return (
-          <Provider store={store}>
-            <StatusBar barStyle='light-content' hidden={true} />
-            <RootNavigator />
-          </Provider>
-        )
-      }
-    } else {
-      return (
-        <View style={{ flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-          <Text>Open up App.js to start working on your app!</Text>
-        </View>
-      )
-    }
+    return (
+      <View style={styles.container}>
+        <Text style={styles.welcome}>Welcome to React Native!</Text>
+        <Text style={styles.instructions}>To get started, edit App.js</Text>
+        <Text style={styles.instructions}>{instructions}</Text>
+      </View>
+    );
   }
 }
 
-export default App
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+  },
+  welcome: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
+  },
+  instructions: {
+    textAlign: 'center',
+    color: '#333333',
+    marginBottom: 5,
+  },
+});
