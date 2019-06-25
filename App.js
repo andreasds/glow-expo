@@ -10,6 +10,9 @@ import React, { Component } from 'react'
 import { Platform, StatusBar, StyleSheet, Text, View } from 'react-native'
 import Orientation from 'react-native-orientation'
 
+import { faInfo, faPencilAlt, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { library } from '@fortawesome/fontawesome-svg-core'
+
 import { Provider } from 'react-redux'
 import store from './src/android/redux/store'
 
@@ -21,6 +24,8 @@ const instructions = Platform.select({
     'Double tap R on your keyboard to reload,\n' +
     'Shake or press menu button for dev menu',
 })
+
+library.add(faInfo, faPencilAlt, faTimes)
 
 export default class App extends Component {
   componentDidMount() {
