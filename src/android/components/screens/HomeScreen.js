@@ -250,8 +250,8 @@ class HomeScreen extends Component {
     }
 
     render() {
-        console.log('props = ' + JSON.stringify(this.props))
-        console.log('state = ' + JSON.stringify(this.state))
+        // console.log('props = ' + JSON.stringify(this.props))
+        // console.log('state = ' + JSON.stringify(this.state))
 
         if (!this.props.database.db ||
             this.state.loading ||

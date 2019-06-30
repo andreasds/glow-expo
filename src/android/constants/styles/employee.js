@@ -38,11 +38,6 @@ export const containerStyle = {
     padding: width * 0.03
 }
 
-export const iconStyle = {
-    textAlign: 'center',
-    textAlignVertical: 'center'
-}
-
 export const listContainer = {
     alignItems: 'center',
     backgroundColor: 'lightslategrey',
@@ -82,6 +77,7 @@ export const modifyButtonContainerStyle = {
 }
 
 export const modifyButtonStyle = {
+    alignItems: 'center',
     backgroundColor: 'darkslategrey',
     borderRadius: width * 0.015,
     height: width * 0.1,
