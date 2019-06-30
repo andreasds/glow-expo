@@ -88,6 +88,7 @@ export const containerStyle6 = {
 }
 
 export const dateButtonStyle = {
+    alignItems: 'center',
     backgroundColor: 'darkslategrey',
     borderRadius: width * 0.015,
     justifyContent: 'center',
@@ -117,11 +118,6 @@ export const dateTextStyle = {
     flex: 1,
     fontSize: width * 0.03,
     marginHorizontal: width * 0.01,
-    textAlignVertical: 'center'
-}
-
-export const iconStyle = {
-    textAlign: 'center',
     textAlignVertical: 'center'
 }
 
@@ -182,6 +178,7 @@ export const modifyButtonContainerStyle2 = {
 }
 
 export const modifyButtonStyle = {
+    alignItems: 'center',
     backgroundColor: 'darkslategrey',
     borderRadius: width * 0.015,
     height: width * 0.1,

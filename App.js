@@ -10,7 +10,7 @@ import React, { Component } from 'react'
 import { Platform, StatusBar, StyleSheet, Text, View } from 'react-native'
 import Orientation from 'react-native-orientation'
 
-import { faInfo, faPencilAlt, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faInfo, faPencilAlt, faSearch, faSync, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { library } from '@fortawesome/fontawesome-svg-core'
 
 import { Provider } from 'react-redux'
@@ -25,7 +25,7 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 })
 
-library.add(faInfo, faPencilAlt, faTimes)
+library.add(faInfo, faPencilAlt, faSearch, faSync, faTimes)
 
 export default class App extends Component {
   componentDidMount() {
