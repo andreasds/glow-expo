@@ -38,6 +38,7 @@ export const countTextStyle = {
 }
 
 export const dateButtonStyle = {
+    alignItems: 'center',
     backgroundColor: 'darkslategrey',
     borderRadius: width * 0.015,
     justifyContent: 'center',

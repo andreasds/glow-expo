@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import HomeScreen from '../screens/HomeScreen'
 import CustomerNavigator from '../navigations/CustomerNavigator'
 import EmployeeNavigator from '../navigations/EmployeeNavigator'
-// import SummaryScreen from '../screens/SummaryScreen'
+import SummaryScreen from '../screens/SummaryScreen'
 import TreatmentNavigator from '../navigations/TreatmentNavigator'
 
 const RootNavigator = createStackNavigator(
@@ -12,7 +12,7 @@ const RootNavigator = createStackNavigator(
         Home: HomeScreen,
         Customer: CustomerNavigator,
         Employee: EmployeeNavigator,
-        // Summary: SummaryScreen,
+        Summary: SummaryScreen,
         Treatment: TreatmentNavigator
     }
 )
