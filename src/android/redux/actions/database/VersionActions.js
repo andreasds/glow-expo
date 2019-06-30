@@ -1,19 +1,18 @@
 import { createVersionTableQuery, getLastVersionQuery, insertCurrentVersionQuery } from '../../../constants/database/versions'
 
-export const insertCurrentVersion = (db, version, _callback) => {
+export const createVersionTable = (db, _callback) => {
     db.transaction(
         (tx) => {
-            tx.executeSql(insertCurrentVersionQuery(version), [],
+            tx.executeSql(createVersionTableQuery(), [],
                 (_, success) => {
-                    // success = {"insertId":0,"rowsAffected":0,"rows":{"_array":[],"length":0}}
-                    _callback({ currentVersion: { result: 'success' } })
-                },
-                (error) => {
-                    _callback({ currentVersion: { result: 'error', error } })
+                    // success = {"rows":{"length":0},"rowsAffected":0}
+                    _callback({ versionTable: { result: 'success' } })
                 }
             )
         },
-        (error) => { },
+        (error) => {
+            _callback({ versionTable: { result: 'error', error } })
+        },
         (success) => { }
     )
 }
@@ -22,38 +21,37 @@ export const getLastVersion = (db, _callback) => {
     db.transaction(
         (tx) => {
             tx.executeSql(getLastVersionQuery(), [],
-                (_, { rows: { _array } }) => {
+                (_, success) => {
+                    // success = {"rows":{"length":1},"rowsAffected":0}
                     // _array = [{"version":"1.0.0","time_updated":"2019-04-25 08:41:03"}]
-                    if (!_array.length) {
-                        _callback({ lastVersion: null })
-                    } else {
-                        _callback({ lastVersion: _array[0] })
+                    let _array = []
+                    for (let i = 0; i < success.rows.length; i++) {
+                        _array.push(success.rows.item(i))
                     }
-                },
-                (error) => {
-                    _callback({ lastVersion: null })
+                    _callback({ lastVersion: _array[0] })
                 }
             )
         },
-        (error) => { },
+        (error) => {
+            _callback({ lastVersion: null })
+        },
         (success) => { }
     )
 }
 
-export const createVersionTable = (db, _callback) => {
+export const insertCurrentVersion = (db, version, _callback) => {
     db.transaction(
         (tx) => {
-            tx.executeSql(createVersionTableQuery(), [],
-                (_, { rows: { _array } }) => {
-                    // _array = []
-                    _callback({ versionTable: { result: 'success' } })
-                },
-                (error) => {
-                    _callback({ versionTable: { result: 'error', error } })
+            tx.executeSql(insertCurrentVersionQuery(version), [],
+                (_, success) => {
+                    // success = {"rows":{"length":0},"rowsAffected":1,"insertId":1}
+                    _callback({ currentVersion: { result: 'success' } })
                 }
             )
         },
-        (error) => { },
+        (error) => {
+            _callback({ currentVersion: { result: 'error', error } })
+        },
         (success) => { }
     )
 }
