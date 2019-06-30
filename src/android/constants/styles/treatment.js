@@ -108,6 +108,7 @@ export const modifyButtonContainerStyle = {
 }
 
 export const modifyButtonStyle = {
+    alignItems: 'center',
     backgroundColor: 'darkslategrey',
     borderRadius: width * 0.015,
     height: width * 0.1,

@@ -5,7 +5,7 @@ import HomeScreen from '../screens/HomeScreen'
 // import CustomerNavigator from '../navigations/CustomerNavigator'
 import EmployeeNavigator from '../navigations/EmployeeNavigator'
 // import SummaryScreen from '../screens/SummaryScreen'
-// import TreatmentNavigator from '../navigations/TreatmentNavigator'
+import TreatmentNavigator from '../navigations/TreatmentNavigator'
 
 const RootNavigator = createStackNavigator(
     {
@@ -13,7 +13,7 @@ const RootNavigator = createStackNavigator(
         // Customer: CustomerNavigator,
         Employee: EmployeeNavigator,
         // Summary: SummaryScreen,
-        // Treatment: TreatmentNavigator
+        Treatment: TreatmentNavigator
     }
 )
 
