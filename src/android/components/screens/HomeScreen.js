@@ -8,6 +8,18 @@ import { PRODUCT_NAME } from '../../constants/database/productsDetails'
 import { SALE_TIME_CREATED } from '../../constants/database/sales'
 import { STYLIST_FIRST_NAME, STYLIST_LAST_NAME } from '../../constants/database/stylists'
 
+import {
+    bluetoothDevicesGot,
+    bluetoothDisabled,
+    bluetoothEnabled,
+    connectBluetoothPrinter,
+    disableBluetooth,
+    enableBluetooth,
+    isBluetoothEnabled,
+    printerGot,
+    scanBluetoothDevices
+} from '../../redux/actions/BluetoothActions'
+
 import { buttonStyle, buttonTextStyle, highlightButtonColor } from '../../constants/styles/home'
 import { containerStyle } from '../../constants/styles/home'
 
@@ -196,6 +208,45 @@ class HomeScreen extends Component {
                     this.setState({ loading: this.state.loading - 1 })
                     break
                 }
+                case 'isBluetoothEnabled': {
+                    if (_result[key].result) {
+                        this.props.bluetoothEnabled()
+                    } else {
+                        this.props.bluetoothDisabled()
+                    }
+
+                    this.setState({ loading: this.state.loading + 1 })
+                    enableBluetooth(this._reinitializeHome)
+
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'enableBluetooth': {
+                    this.props.bluetoothDevicesGot(this.props.bluetooth.found, _result[key].paired)
+
+                    this.setState({ loading: this.state.loading + 1 })
+                    scanBluetoothDevices(this._reinitializeHome)
+
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'scanBluetooth': {
+                    this.props.bluetoothDevicesGot(
+                        _result[key].found || this.props.bluetooth.found,
+                        _result[key].paired || this.props.bluetooth.paired
+                    )
+
+                    this.setState({ loading: this.state.loading + 1 })
+                    connectBluetoothPrinter(this.props.bluetooth.found, this.props.bluetooth.paired, this._reinitializeHome)
+
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'connectBluetoothPrinter': {
+                    this.props.printerGot(_result[key].printer)
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
                 default: {
                     console.log('Unprocessed _result[\'' + key + '\'] = ' + JSON.stringify(_result[key]))
                     break
@@ -205,23 +256,23 @@ class HomeScreen extends Component {
     }
 
     componentDidMount() {
+        let loading = 0
+        if (!this.props.database.db) loading = loading + 1
+        if (!this.props.bluetooth.isEnable) loading = loading + 1
+        this.setState({ loading: this.state.loading + loading })
+
         if (!this.props.database.db) {
             const db = openDatabase({ name: DATABASE_NAME })
 
             // check last version
-            this.setState({ loading: this.state.loading + 1 })
             getLastVersion(db, this._reinitializeHome)
 
             this.props.databaseOpened(db)
         }
 
-        // if (!this.props.bluetooth.isEnable) {
-        //     BluetoothManager.isBluetoothEnabled().then((enabled) => {
-        //         console.log("Bluetooth enable = " + JSON.stringify(enabled))
-        //     }, (error) => {
-        //         console.log("Bluetooth error = " + JSON.stringify(error))
-        //     })
-        // }
+        if (!this.props.bluetooth.isEnable) {
+            isBluetoothEnabled(this._reinitializeHome)
+        }
     }
 
     _onCustomerButtonPressed() {
@@ -321,13 +372,13 @@ class HomeScreen extends Component {
 }
 
 const mapStateToProps = state => {
-    const { isEnable } = state.bluetoothReducers
+    const { found, isEnable, paired, printer } = state.bluetoothReducers
     const { db } = state.databaseReducers
     const { products, productsLen } = state.productReducers
     const { sales, salesLen } = state.saleReducers
     const { stylists, stylistsLen } = state.stylistReducers
     return {
-        bluetooth: { isEnable },
+        bluetooth: { found, isEnable, paired, printer },
         database: { db },
         product: { products, productsLen },
         sale: { sales, salesLen },
@@ -336,7 +387,11 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = dispatch => ({
+    bluetoothDevicesGot: (found, paired) => dispatch(bluetoothDevicesGot(found, paired)),
+    bluetoothDisabled: () => dispatch(bluetoothDisabled()),
+    bluetoothEnabled: () => dispatch(bluetoothEnabled()),
     databaseOpened: (db) => dispatch(databaseOpened(db)),
+    printerGot: (printer) => dispatch(printerGot(printer)),
     productsGot: (products, productsLen) => dispatch(productsGot(products, productsLen)),
     salesGot: (sales, salesLen) => dispatch(salesGot(sales, salesLen)),
     stylistsGot: (stylists, stylistsLen) => dispatch(stylistsGot(stylists, stylistsLen))

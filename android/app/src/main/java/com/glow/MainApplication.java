@@ -3,6 +3,7 @@ package com.glow;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import cn.jystudio.bluetooth.RNBluetoothEscposPrinterPackage;
 import com.horcrux.svg.SvgPackage;
 import com.github.yamill.orientation.OrientationPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
@@ -27,6 +28,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNBluetoothEscposPrinterPackage(),
             new SvgPackage(),
             new OrientationPackage(),
             new RNGestureHandlerPackage(),
