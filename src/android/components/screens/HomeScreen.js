@@ -13,7 +13,6 @@ import {
     bluetoothDisabled,
     bluetoothEnabled,
     connectBluetoothPrinter,
-    disableBluetooth,
     enableBluetooth,
     isBluetoothEnabled,
     printerGot,
@@ -222,6 +221,7 @@ class HomeScreen extends Component {
                     break
                 }
                 case 'enableBluetooth': {
+                    this.props.bluetoothEnabled()
                     this.props.bluetoothDevicesGot(this.props.bluetooth.found, _result[key].paired)
 
                     this.setState({ loading: this.state.loading + 1 })
@@ -236,8 +236,8 @@ class HomeScreen extends Component {
                         _result[key].paired || this.props.bluetooth.paired
                     )
 
-                    this.setState({ loading: this.state.loading + 1 })
-                    connectBluetoothPrinter(this.props.bluetooth.found, this.props.bluetooth.paired, this._reinitializeHome)
+                    // this.setState({ loading: this.state.loading + 1 })
+                    // connectBluetoothPrinter(this.props.bluetooth.found, this.props.bluetooth.paired, this._reinitializeHome)
 
                     this.setState({ loading: this.state.loading - 1 })
                     break
@@ -291,7 +291,8 @@ class HomeScreen extends Component {
     }
 
     _onPrinterButtonPressed() {
-
+        const { navigate } = this.props.navigation
+        navigate('Bluetooth')
     }
 
     _onSummaryButtonPressed() {
@@ -330,7 +331,7 @@ class HomeScreen extends Component {
                     return loadingScreen('ERROR: Reading stylists', '')
                 }
             } else {
-                return loadingScreen('Reading database', '')
+                return loadingScreen('Searching bluetooth printer', '')
             }
         }
 

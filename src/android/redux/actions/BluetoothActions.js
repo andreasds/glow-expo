@@ -10,8 +10,13 @@ export const isBluetoothEnabled = (_callback) => {
     })
 }
 
-export const disableBluetooth = () => {
-
+export const disableBluetooth = (_callback) => {
+    BluetoothManager.disableBluetooth().then((result) => {
+        _callback({ disableBluetooth: { result } })
+    }, (error) => {
+        console.log('error = ' + JSON.stringify(error))
+        _callback({ disableBluetooth: { result: 'error', error } })
+    })
 }
 
 export const enableBluetooth = (_callback) => {
@@ -48,6 +53,22 @@ export const scanBluetoothDevices = (_callback) => {
             scanBluetooth: {
                 found: null,
                 paired: null,
+                error
+            }
+        })
+    })
+}
+
+export const connectBluetooth = (device, _callback) => {
+    BluetoothManager.connect(device.address).then((s) => {
+        _callback({
+            connectBluetooth: { printer: device }
+        })
+    }, (error) => {
+        console.log('error = ' + JSON.stringify(error))
+        _callback({
+            connectBluetooth: {
+                printer: null,
                 error
             }
         })
