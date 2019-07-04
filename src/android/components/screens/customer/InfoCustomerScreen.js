@@ -3,13 +3,16 @@ import { Alert, FlatList, ScrollView, Text, TouchableHighlight, View } from 'rea
 import { connect } from 'react-redux'
 
 import { PRODUCT_ID, PRODUCT_NAME, PRODUCT_PACKAGE } from '../../../constants/database/productsDetails'
-import { CURRENT_TIMESTAMP, SALE_AMOUNT, SALE_AMOUNT_PAID, SALE_CUSTOMER_NAME, SALE_TIME_CREATED, SALE_TIME_PAID } from '../../../constants/database/sales'
+import { CURRENT_TIMESTAMP, SALE_AMOUNT, SALE_AMOUNT_PAID, SALE_CUSTOMER_NAME, SALE_TIME_CREATED, SALE_TIME_PAID, SALE_ID } from '../../../constants/database/sales'
 import { SALE_PRODUCT_PRICE } from '../../../constants/database/salesProducts'
 import { STYLIST_FIRST_NAME, STYLIST_ID, STYLIST_LAST_NAME } from '../../../constants/database/stylists'
 
 import { loadingScreen } from '../../../constants/LoadingScreen'
+import { getCurrentDateTime } from '../../../constants/utils/date'
 import { intToNumberCurrencyString } from '../../../constants/utils/number'
 
+import { connectBluetoothPrinter } from '../../../redux/actions/BluetoothActions'
+import { printReceipt } from '../../../redux/actions/PrinterActions'
 import { salesGot, selectAllActiveSaleUnPaid, updateSale } from '../../../redux/actions/database/SaleActions'
 
 import { buttonContainerStyle, buttonStyle, buttonTextStyle, highlightButtonColor } from '../../../constants/styles/customer'
@@ -64,11 +67,8 @@ class InfoCustomerScreen extends Component {
                     this.props.salesGot(sales._array, sales.length)
 
                     if (this.state.mode === 'info') {
-                        this.setState({
-                            loading: this.state.loading + 1,
-                            process: 'print'
-                        })
-                        this._onPrintRoutine()
+                        this.setState({ loading: this.state.loading + 1 })
+                        connectBluetoothPrinter(this.props.bluetooth.found, this.props.bluetooth.paired, this._reinitializeInfoCustomer)
                     } else {
                         this.props.navigation.state.params.onGoBack()
                         const { goBack } = this.props.navigation
@@ -76,6 +76,19 @@ class InfoCustomerScreen extends Component {
                     }
 
                     this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'connectBluetoothPrinter': {
+                    this.setState({ process: 'print' })
+                    this._onPrintRoutine()
+                    this.setState({ loading: this.state.loading - 1 })
+                    break
+                }
+                case 'printReceipt': {
+                    this.setState({
+                        loading: this.state.loading - 1,
+                        process: ''
+                    })
                     break
                 }
                 default: {
@@ -123,11 +136,38 @@ class InfoCustomerScreen extends Component {
     }
 
     _onPrintRoutine() {
-        console.log('PRINT!')
-        this.setState({
-            loading: this.state.loading - 1,
-            process: ''
-        })
+        let salePrint = {}
+        salePrint[SALE_ID] = this.state.sale[SALE_ID].toString()
+        salePrint[SALE_CUSTOMER_NAME] = this.state.sale[SALE_CUSTOMER_NAME]
+        salePrint[SALE_AMOUNT] = intToNumberCurrencyString(this.state.sale[SALE_AMOUNT])
+
+        let products = []
+        for (productIndex in this.state.sale.products) {
+            let prod = this.state.sale.products[productIndex]
+            let product = {}
+            product[PRODUCT_NAME] = this._getProductName(prod[PRODUCT_ID])
+            product[SALE_PRODUCT_PRICE] = intToNumberCurrencyString(prod[SALE_PRODUCT_PRICE], 0)
+
+            let packages = null
+            if (prod[PRODUCT_PACKAGE] === 'N') {
+                product[STYLIST_FIRST_NAME] = this._getStylistName(prod.packages[0][STYLIST_ID])
+            } else {
+                packages = []
+                for (packageIndex in prod.packages) {
+                    let pack = {}
+                    pack[PRODUCT_NAME] = this._getProductName(prod.packages[packageIndex][PRODUCT_ID])
+                    pack[STYLIST_FIRST_NAME] = this._getStylistName(prod.packages[packageIndex][STYLIST_ID])
+                    packages.push(pack)
+                }
+            }
+            product['packages'] = packages
+            products.push(product)
+        }
+        salePrint['products'] = products
+        salePrint[SALE_TIME_PAID] = getCurrentDateTime()
+
+        this.setState({ loading: this.state.loading + 1 })
+        printReceipt(salePrint, this._reinitializeInfoCustomer)
     }
 
     _checkSale() {
@@ -165,8 +205,7 @@ class InfoCustomerScreen extends Component {
                                 })
                                 updateSale(this.props.database.db, sale, this._reinitializeInfoCustomer)
                             } else {
-                                this.setState({ process: 'print' })
-                                this._onPrintRoutine()
+                                connectBluetoothPrinter(this.props.bluetooth.found, this.props.bluetooth.paired, this._reinitializeInfoCustomer)
                             }
                         }
                     },
@@ -369,10 +408,12 @@ class InfoCustomerScreen extends Component {
 }
 
 const mapStateToProps = state => {
+    const { found, paired, printer } = state.bluetoothReducers
     const { db } = state.databaseReducers
     const { products, productsLen } = state.productReducers
     const { stylists, stylistsLen } = state.stylistReducers
     return {
+        bluetooth: { found, paired, printer },
         database: { db },
         product: { products, productsLen },
         stylist: { stylists, stylistsLen }

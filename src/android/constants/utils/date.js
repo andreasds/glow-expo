@@ -10,6 +10,13 @@ export const getCurrentDate = () => {
     return current_date
 }
 
+export const getCurrentDateTime = () => {
+    let date = new Date()
+    let current_date_time = date.getFullYear() + '-' + intToStringLeadingZero((date.getMonth() + 1), 2) + '-' + intToStringLeadingZero(date.getDate(), 2)
+    current_date_time = current_date_time + ' ' + intToStringLeadingZero(date.getHours(), 2) + ':' + intToStringLeadingZero(date.getMinutes(), 2) + ':' + intToStringLeadingZero(date.getSeconds(), 2)
+    return current_date_time
+}
+
 export const getDateString = (year, month, day) => {
     return year + '-' + intToStringLeadingZero(month + 1, 2) + '-' + intToStringLeadingZero(day, 2)
 }

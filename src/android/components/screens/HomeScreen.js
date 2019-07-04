@@ -236,8 +236,8 @@ class HomeScreen extends Component {
                         _result[key].paired || this.props.bluetooth.paired
                     )
 
-                    // this.setState({ loading: this.state.loading + 1 })
-                    // connectBluetoothPrinter(this.props.bluetooth.found, this.props.bluetooth.paired, this._reinitializeHome)
+                    this.setState({ loading: this.state.loading + 1 })
+                    connectBluetoothPrinter(this.props.bluetooth.found, this.props.bluetooth.paired, this._reinitializeHome)
 
                     this.setState({ loading: this.state.loading - 1 })
                     break
