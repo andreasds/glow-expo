@@ -1,4 +1,4 @@
-package com.glow;
+package com.andreas.glow;
 
 import com.facebook.react.ReactActivity;
 

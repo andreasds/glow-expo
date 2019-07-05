@@ -27,7 +27,7 @@ export const printReceipt = async (sale, _callback) => {
             for (let j = 0; j < packs.length; j++) {
                 await BluetoothEscposPrinter.printColumn([2, 30],
                     [BluetoothEscposPrinter.ALIGN.LEFT, BluetoothEscposPrinter.ALIGN.LEFT],
-                    ['', packs[j][PRODUCT_NAME].toUpperCase() + ' [' + packs[j][STYLIST_FIRST_NAME] + ']'],
+                    ['', packs[j][PRODUCT_NAME].toUpperCase() + ' [' + packs[j][STYLIST_FIRST_NAME].toUpperCase() + ']'],
                     { fonttype: 0 })
             }
         } else {
